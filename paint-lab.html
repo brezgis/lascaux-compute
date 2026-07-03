@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>paint lab</title>
+<style>
+  body { background: #171310; color: #c9b99a; font: 13px monospace; margin: 20px; }
+  .panel { display: inline-block; vertical-align: top; margin: 10px; }
+  .panel canvas { display: block; border-radius: 4px; }
+  .panel .t { margin-top: 4px; opacity: 0.8; }
+</style>
+</head>
+<body>
+<div id="grid"></div>
+<script type="module">
+import { PAINTINGS, bakePainting } from './src/paintings.js';
+import { mulberry32 } from './src/paint.js';
+
+const params = new URLSearchParams(location.search);
+const only = params.get('only') ? params.get('only').split(',') : null;
+const scale = parseFloat(params.get('scale') || '0.6');
+
+// fake rock backdrop so contrast reads correctly
+function rockBg(w, h, seed) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const x = c.getContext('2d');
+  const rng = mulberry32(seed);
+  x.fillStyle = '#b5a186';
+  x.fillRect(0, 0, w, h);
+  for (let i = 0; i < w * h / 40; i++) {
+    const v = 150 + rng() * 70;
+    x.fillStyle = `rgba(${v * 1.08},${v},${v * 0.84},${0.04 + rng() * 0.08})`;
+    const r = 2 + rng() * 26;
+    x.beginPath();
+    x.arc(rng() * w, rng() * h, r, 0, 6.29);
+    x.fill();
+  }
+  // darker mottling
+  for (let i = 0; i < w * h / 160; i++) {
+    x.fillStyle = `rgba(70,58,44,${0.03 + rng() * 0.06})`;
+    const r = 4 + rng() * 40;
+    x.beginPath();
+    x.arc(rng() * w, rng() * h, r, 0, 6.29);
+    x.fill();
+  }
+  return c;
+}
+
+const grid = document.getElementById('grid');
+for (const p of PAINTINGS) {
+  if (only && !only.includes(p.id)) continue;
+  const t0 = performance.now();
+  const art = bakePainting(p, scale);
+  const ms = (performance.now() - t0).toFixed(0);
+  const c = document.createElement('canvas');
+  c.width = art.width; c.height = art.height;
+  const x = c.getContext('2d');
+  x.drawImage(rockBg(c.width, c.height, p.seed), 0, 0);
+  x.drawImage(art, 0, 0);
+  const div = document.createElement('div');
+  div.className = 'panel';
+  const label = document.createElement('div');
+  label.className = 't';
+  label.textContent = `${p.id} — ${p.title} (${ms}ms)`;
+  div.appendChild(c);
+  div.appendChild(label);
+  grid.appendChild(div);
+}
+window.__done = true;
+</script>
+</body>
+</html>

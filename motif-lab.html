@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>motif lab</title>
+<style>
+  body { background: #171310; color: #c9b99a; font: 12px monospace; margin: 16px; }
+  .m { display: inline-block; vertical-align: top; margin: 6px; text-align: center; }
+  .m canvas { display: block; background: #b5a186; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="grid"></div>
+<script type="module">
+import { MOTIFS, bakeMotif } from './src/motifs.js';
+
+const grid = document.getElementById('grid');
+for (const kind of Object.keys(MOTIFS)) {
+  for (let v = 0; v < 3; v++) {
+    const art = bakeMotif(kind, v);
+    const c = document.createElement('canvas');
+    const scale = 220 / art.width;
+    c.width = 220; c.height = art.height * scale;
+    const x = c.getContext('2d');
+    x.drawImage(art, 0, 0, c.width, c.height);
+    const d = document.createElement('div');
+    d.className = 'm';
+    d.appendChild(c);
+    const t = document.createElement('div');
+    t.textContent = `${kind} v${v}`;
+    d.appendChild(t);
+    grid.appendChild(d);
+  }
+}
+window.__done = true;
+</script>
+</body>
+</html>
