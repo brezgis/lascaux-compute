@@ -1,6 +1,11 @@
 # GROTTE DU CALCUL
 
-*The painted cave of computation.*
+*The painted cave of computation. The history of computing, if it happened
+17,000+ years earlier.*
+
+**[Enter the cave →](https://recursite.brezgis.com/lascaux/)**
+
+![The Great Tape-Beast — Panel II, charcoal and red ochre, c. 1936 — in the Hall of Automata](docs/cave.png)
 
 A first-person browser toy: walk into a torchlit cave and read the history of
 computation and NLP (1913–1997, plus one disputed intrusion) as parietal art —
@@ -10,6 +15,8 @@ requires, by four teenagers following a dog named Robot.¹
 
 ¹ The real Lascaux was discovered in 1940 by four teenagers following a dog
 actually named Robot. Some things cannot be improved upon.
+
+![The title screen — click to light your torch](docs/title.png)
 
 ## The chambers
 
@@ -46,7 +53,8 @@ centuries of other painters.
 
 ## Running
 
-Static files, ES modules — needs any web server (`file://` won't do):
+Static files, ES modules — needs any web server (`file://` won't do) and a
+browser with WebGL:
 
 ```
 python3 -m http.server 8000
