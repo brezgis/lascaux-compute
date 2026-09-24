@@ -8,15 +8,17 @@ const EYE = 1.62;
 const CLEARANCE = 0.55; // how far from the wall the body stays
 
 export function makePlayer(camera, sdf, dom) {
-  let yaw = Math.PI;      // facing -z (into the cave)
+  let yaw = 0;            // facing -z (into the cave); forward is (-sin yaw, -cos yaw)
   let pitch = 0;
   const pos = new THREE.Vector3(0, sdf.floorHeight(0, 43) + EYE, 43);
   const keys = new Set();
-  let bobT = 0;
+  let bobT = 0, bobAmp = 0;
   const grad = new THREE.Vector3();
 
+  const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+
   const state = {
-    pos, locked: false, moving: false,
+    pos, locked: false, moving: false, active: true, speed: 0, onStep: null,
     get yaw() { return yaw; },
     set(x, z, yw) {
       pos.x = x; pos.z = z; yaw = yw;
@@ -70,12 +72,16 @@ export function makePlayer(camera, sdf, dom) {
       }
     }
   }, { passive: true });
-  dom.addEventListener('touchend', (e) => {
+  // a cancelled touch (system gesture, notification) must also let go,
+  // or the visitor keeps walking into the wall forever
+  const endTouch = (e) => {
     for (const t of e.changedTouches) {
       if (walkTouch && t.identifier === walkTouch.id) { walkTouch = null; walkVec.x = walkVec.y = 0; }
       if (lookTouch && t.identifier === lookTouch.id) lookTouch = null;
     }
-  });
+  };
+  dom.addEventListener('touchend', endTouch);
+  dom.addEventListener('touchcancel', endTouch);
 
   // ---------- movement
   function passable(x, y, z) {
@@ -86,6 +92,7 @@ export function makePlayer(camera, sdf, dom) {
 
   function update(dt) {
     let fwd = 0, str = 0;
+    if (!state.active) { keys.clear(); walkVec.x = walkVec.y = 0; }
     if (keys.has('KeyW') || keys.has('ArrowUp')) fwd += 1;
     if (keys.has('KeyS') || keys.has('ArrowDown')) fwd -= 1;
     if (keys.has('KeyA') || keys.has('ArrowLeft')) str -= 1;
@@ -101,8 +108,10 @@ export function makePlayer(camera, sdf, dom) {
     const vz = (-cos * fwd - sin * str) * speed * dt;
 
     // axis-separated slide
+    const x0 = pos.x, z0 = pos.z;
     if (vx !== 0 && passable(pos.x + vx, pos.y, pos.z)) pos.x += vx;
     if (vz !== 0 && passable(pos.x, pos.y, pos.z + vz)) pos.z += vz;
+    const moved = Math.hypot(pos.x - x0, pos.z - z0);   // real ground covered
 
     // soft push-out if the walls have crept too close (noise pockets)
     const here = sdf.sample(pos.x, pos.y - 0.4, pos.z);
@@ -117,12 +126,21 @@ export function makePlayer(camera, sdf, dom) {
     const targetY = fl + EYE;
     pos.y += (targetY - pos.y) * Math.min(1, dt * 9);
 
-    // head bob
-    if (state.moving) bobT += dt * (speed > 4 ? 11 : 8.2);
-    const bob = Math.sin(bobT) * 0.028 * (state.moving ? 1 : 0);
+    // stride: head bob and footfalls follow ground actually covered, so
+    // pushing against a wall neither bobs nor stamps. One bob per step;
+    // a hurried stride is longer.
+    const stride = speed > 4 ? 0.86 : 0.7;
+    state.speed = dt > 0 ? moved / dt : 0;
+    const prev = bobT;
+    bobT += (moved / stride) * Math.PI * 2;
+    // the foot lands at the bottom of the bob (sin = -1)
+    const landed = Math.floor((bobT + Math.PI / 2) / (Math.PI * 2)) > Math.floor((prev + Math.PI / 2) / (Math.PI * 2));
+    if (landed && state.onStep) state.onStep(Math.min(1, state.speed / 4.6));
+    bobAmp += ((state.speed > 0.3 ? 1 : 0) - bobAmp) * Math.min(1, dt * 6);
+    const bob = Math.sin(bobT) * 0.028 * bobAmp;
 
     camera.position.set(pos.x, pos.y + bob, pos.z);
-    camera.quaternion.setFromEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
+    camera.quaternion.setFromEuler(euler.set(pitch, yaw, 0, 'YXZ'));
   }
 
   return Object.assign(state, { update });

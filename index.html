@@ -30,11 +30,11 @@
 
   /* ---------------- title screen ---------------- */
   #title {
-    position: fixed; inset: 0; z-index: 20;
+    position: fixed; inset: 0; z-index: 20; overflow-y: auto;
     background:
       radial-gradient(ellipse at 50% 110%, rgba(122, 63, 24, 0.24), transparent 55%),
       radial-gradient(ellipse at 50% 40%, #0b0805 0%, #030201 75%);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: safe center;
     text-align: center; padding: 24px; cursor: pointer;
     transition: opacity 1.6s ease;
   }
@@ -70,12 +70,12 @@
   }
   #enter.ready { animation: breathe 2.2s ease-in-out infinite; }
   @keyframes breathe { 0%, 100% { opacity: 0.65; } 50% { opacity: 1; } }
-  #title .foot { position: absolute; bottom: 18px; font-size: 11px; font-family: 'Courier New', monospace; color: #5c4f39; letter-spacing: 1px; }
+  #title .foot { margin-top: 28px; font-size: 11px; font-family: 'Courier New', monospace; color: #5c4f39; letter-spacing: 1px; }
 
   /* ---------------- plaque ---------------- */
   #plaque {
     position: fixed; left: 50%; bottom: 6vh; transform: translateX(-50%) translateY(14px);
-    z-index: 10; width: min(620px, 92vw);
+    z-index: 10; width: min(640px, 92vw);
     background: linear-gradient(172deg, #171008 0%, #100b06 100%);
     border: 1px solid #3d3220; border-left: 3px solid var(--ochre);
     box-shadow: 0 12px 44px rgba(0,0,0,0.8);
@@ -91,8 +91,16 @@
   }
   #plaque .p-body {
     font-size: 13.5px; line-height: 1.68; color: #bdaa87; margin-top: 12px;
-    max-height: 30vh; overflow-y: auto;
+    max-height: 30vh; overflow-y: auto; overscroll-behavior: contain;
   }
+  @media (max-width: 560px), (max-height: 560px) {
+    #plaque { padding: 12px 15px 11px; bottom: 3vh; }
+    #plaque .p-title { font-size: 16px; }
+    #plaque .p-sub { font-size: 9.5px; }
+    #plaque .p-body { font-size: 12.5px; line-height: 1.55; margin-top: 8px; max-height: 38vh; }
+  }
+  /* on touch screens the plaque can be scrolled with a finger */
+  @media (pointer: coarse) { #plaque.show { pointer-events: auto; } }
 
   /* ---------------- chamber toast ---------------- */
   #toast {
@@ -112,6 +120,7 @@
     box-shadow: 0 18px 70px rgba(0,0,0,0.9); padding: 14px;
   }
   #map.show { display: block; }
+  #mapCanvas { display: block; width: auto; height: auto; max-width: calc(100vw - 48px); max-height: calc(100vh - 80px); }
   #map .m-head { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 2px; color: var(--ochre); text-align: center; margin-bottom: 8px; }
 
   #hint {
@@ -120,6 +129,17 @@
     color: rgba(160, 140, 100, 0.5); pointer-events: none;
   }
   @media (pointer: coarse) { #hint { display: none; } }
+
+  /* touch has no M or N key */
+  #touchbar { position: fixed; right: 12px; top: 12px; z-index: 16; display: none; gap: 8px; }
+  #touchbar button {
+    font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 2px;
+    color: var(--bone); background: rgba(21, 16, 10, 0.72); border: 1px solid #5c4f39;
+    border-radius: 3px; padding: 8px 12px;
+  }
+  @media (pointer: coarse) { #touchbar.on { display: flex; } }
+  .touch-only { display: none; }
+  @media (pointer: coarse) { .touch-only { display: inline; } .desk-only { display: none; } }
 </style>
 </head>
 <body>
@@ -133,14 +153,16 @@
   <h2>the painted cave of computation</h2>
   <p class="lore">Sealed for an unknown span and found again — as tradition
   absolutely requires — by four teenagers following a dog named Robot, the cave
-  preserves nineteen painted panels spanning the years 1913–1997, one intrusion
-  of disputed date, and some hundred lesser figures crowding every wall and
-  ceiling. The pigments are red ochre, charcoal, and a green that should not
-  exist. The torch was found at the entrance, still warm. Visitors are asked
+  preserves fifty-five painted panels spanning some twenty thousand years —
+  from a notched baboon bone to a beast that guesses the next mark — two
+  intrusions of disputed date, and some three hundred lesser figures crowding
+  every wall and ceiling. The pigments are red ochre, charcoal, kaolin, and a
+  green that should not exist. The torch was found at the entrance, still warm. Visitors are asked
   not to feed the Perceptron. Remember to look up.</p>
   <div class="sig">— MINISTRY OF PREHISTORIC COMPUTATION · BULLETIN Nº 5</div>
   <div class="keys">
-    <b>W A S D</b> walk &nbsp; <b>mouse</b> torch &amp; gaze &nbsp; <b>M</b> survey map &nbsp; <b>N</b> sound<br>
+    <span class="desk-only"><b>W A S D</b> walk &nbsp; <b>mouse</b> torch &amp; gaze &nbsp; <b>M</b> survey map &nbsp; <b>N</b> sound<br></span>
+    <span class="touch-only">left thumb walks &nbsp; right thumb looks &nbsp; <b>MAP</b> and <b>SOUND</b> top right<br></span>
     stand before a painting and its plaque will surface
   </div>
   <div id="enter">EXCAVATING&hellip;</div>
@@ -160,8 +182,10 @@
 
 <div id="map">
   <div class="m-head">RELEVÉ DE LA GROTTE · SURVEY OF RECORD</div>
-  <canvas id="mapCanvas" width="460" height="560"></canvas>
+  <canvas id="mapCanvas" width="520" height="660"></canvas>
 </div>
+
+<div id="touchbar"><button id="btnMap">MAP</button><button id="btnSound">SOUND</button></div>
 
 <div id="hint">M map &nbsp;·&nbsp; N sound &nbsp;·&nbsp; ESC release torch</div>
 

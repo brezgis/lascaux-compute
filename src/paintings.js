@@ -7,70 +7,10 @@
 
 import { makePainter } from './paint.js';
 
-// --------------------------------------------------------------- shared forms
-
-export function spiralPts(cx, cy, r0, r1, turns, ar, mirror = 1) {
-  const pts = [];
-  const n = Math.ceil(turns * 14);
-  for (let i = 0; i <= n; i++) {
-    const t = i / n;
-    const a = t * turns * Math.PI * 2 * mirror;
-    const r = r0 + (r1 - r0) * t;
-    pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r * ar]);
-  }
-  return pts;
-}
-
-// small generic quadruped for herds / minor beasts; faces +x unless flip
-export function beast(g, cx, cy, s, opts = {}) {
-  const { color = 'char', w = 6, flip = false, horns = false, antlers = false,
-          alpha = 0.55, tail = true } = opts;
-  const ar = g.W / g.H;
-  const f = flip ? -1 : 1;
-  const pt = (dx, dy) => [cx + dx * s * f, cy + dy * s * ar];
-  const o = { color, w, alpha };
-  // back + neck + head
-  g.stroke([pt(-0.38, -0.14), pt(-0.05, -0.2), pt(0.18, -0.16), pt(0.32, -0.26), pt(0.45, -0.2), pt(0.5, -0.12)], o);
-  // chest + belly
-  g.stroke([pt(0.42, -0.08), pt(0.3, 0.02), pt(0.02, 0.04), pt(-0.28, 0.0)], o);
-  // legs
-  g.stroke([pt(0.3, -0.02), pt(0.32, 0.3)], { ...o, w: w * 0.85 });
-  g.stroke([pt(0.2, 0.02), pt(0.17, 0.3)], { ...o, w: w * 0.85 });
-  g.stroke([pt(-0.2, 0.02), pt(-0.24, 0.3)], { ...o, w: w * 0.85 });
-  g.stroke([pt(-0.33, -0.02), pt(-0.37, 0.28)], { ...o, w: w * 0.85 });
-  if (tail) g.stroke([pt(-0.38, -0.14), pt(-0.48, -0.02)], { ...o, w: w * 0.7 });
-  if (horns) {
-    g.stroke([pt(0.42, -0.24), pt(0.47, -0.38)], { ...o, w: w * 0.7 });
-    g.stroke([pt(0.37, -0.26), pt(0.34, -0.4)], { ...o, w: w * 0.7 });
-  }
-  if (antlers) {
-    g.stroke([pt(0.4, -0.24), pt(0.44, -0.44), pt(0.52, -0.52)], { ...o, w: w * 0.6 });
-    g.stroke([pt(0.44, -0.44), pt(0.36, -0.54)], { ...o, w: w * 0.6 });
-  }
-  g.dot(...pt(0.43, -0.2), Math.max(3, s * g.W * 0.03), { color, alpha: alpha + 0.15 });
-}
-
-// stick figure. pose: {tilt, armL, armR, legSpread} angles in radians.
-export function stick(g, cx, cy, s, opts = {}) {
-  const { color = 'char', w = 7, alpha = 0.6, tilt = 0,
-          armL = 2.4, armR = 0.7, legSpread = 0.35, headFill = false } = opts;
-  const ar = g.W / g.H;
-  const rot = (dx, dy) => {
-    const c = Math.cos(tilt), sn = Math.sin(tilt);
-    return [cx + (dx * c - dy * sn) * s, cy + (dx * sn + dy * c) * s * ar];
-  };
-  const o = { color, w, alpha };
-  const head = rot(0, -0.52);
-  g.circle(head[0], head[1], s * 0.13, o);
-  if (headFill) g.dot(head[0], head[1], s * g.W * 0.09, { color, alpha: alpha * 0.8 });
-  g.stroke([rot(0, -0.38), rot(0, 0.1)], o);                       // torso
-  const sh = [0, -0.28];
-  g.stroke([rot(...sh), rot(Math.cos(armL) * 0.34, -0.28 + Math.sin(armL) * 0.34)], { ...o, w: w * 0.85 });
-  g.stroke([rot(...sh), rot(Math.cos(armR) * 0.34, -0.28 + Math.sin(armR) * 0.34)], { ...o, w: w * 0.85 });
-  g.stroke([rot(0, 0.1), rot(-legSpread, 0.52)], o);               // legs
-  g.stroke([rot(0, 0.1), rot(legSpread, 0.52)], o);
-  return { head, rot };
-}
+export { spiralPts, beast, stick, handPath } from './forms.js';
+import { spiralPts, beast, stick, handPath } from './forms.js';
+import { EARLY_PANELS } from './panels-early.js';
+import { LATE_PANELS } from './panels-late.js';
 
 // -------------------------------------------------------------------- panels
 
@@ -85,33 +25,7 @@ export const PAINTINGS = [
     w: 1024, aspect: 1.55, size: [2.6, 1.68], seed: 11,
     draw(g) {
       const ar = g.W / g.H;
-      const hand = (cx, cy, s, rot) => {
-        const p = new Path2D();
-        const c = Math.cos(rot), sn = Math.sin(rot);
-        const P = (dx, dy) => [g.X(cx) + (dx * c - dy * sn) * s * g.W, g.Y(cy) + (dx * sn + dy * c) * s * g.W];
-        // palm
-        const [px, py] = P(0, 0.06);
-        p.ellipse(px, py, s * g.W * 0.185, s * g.W * 0.22, rot, 0, 6.29);
-        // wrist
-        const [wx, wy] = P(0, 0.32);
-        p.ellipse(wx, wy, s * g.W * 0.13, s * g.W * 0.18, rot, 0, 6.29);
-        // fingers
-        const angles = [-0.5, -0.22, 0.02, 0.28, 0.95]; // thumb last, wide
-        for (let i = 0; i < 5; i++) {
-          const a = angles[i];
-          const len = i === 4 ? 0.24 : (0.31 - Math.abs(a) * 0.09);
-          const base = i === 4 ? [0.16, 0.04] : [Math.sin(a) * 0.15, -0.1];
-          const tip = i === 4
-            ? [0.16 + Math.sin(1.15) * len, 0.04 - Math.cos(1.15) * len]
-            : [Math.sin(a) * (0.15 + len), -0.1 - Math.cos(a) * len];
-          const [bx, by] = P(...base);
-          const [tx2, ty2] = P(...tip);
-          const mx = (bx + tx2) / 2, my = (by + ty2) / 2;
-          const fl = Math.hypot(tx2 - bx, ty2 - by);
-          p.ellipse(mx, my, fl / 2 + s * g.W * 0.025, s * g.W * 0.058, Math.atan2(ty2 - by, tx2 - bx), 0, 6.29);
-        }
-        return p;
-      };
+      const hand = (cx, cy, s, rot) => handPath(g, cx, cy, s, rot);
       const cursor = (cx, cy, s, rot) => {
         const p = new Path2D();
         const c = Math.cos(rot), sn = Math.sin(rot);
@@ -132,15 +46,16 @@ export const PAINTINGS = [
       g.spray(0.85, 0.32, 0.13, { color: 'red', excludePath: cursor(0.85, 0.32, 0.19, 0.15), density: 2.1, alpha: 0.55 });
       // binary counting marks
       const groups = [['1'], ['1', '0'], ['1', '1'], ['1', '0', '0'], ['1', '0', '1']];
-      let x = 0.68;
+      // (kept clear of the rust hand and inside the panel: 1, 10, 11, 100, 101)
+      let x = 0.555;
       for (const grp of groups) {
         let gx = x;
         for (const b of grp) {
-          if (b === '1') g.line(gx, 0.72, gx, 0.72 + 0.05 * ar, { color: 'char', w: 6, alpha: 0.55 });
-          else g.circle(gx, 0.745, 0.011, { color: 'char', w: 5, alpha: 0.5 });
+          if (b === '1') g.line(gx, 0.84, gx, 0.84 + 0.05 * ar, { color: 'char', w: 6, alpha: 0.6 });
+          else g.circle(gx, 0.84 + 0.025 * ar, 0.007, { color: 'char', w: 3.5, alpha: 0.55 });
           gx += 0.026;
         }
-        x = gx + 0.025;
+        x = gx + 0.03;
       }
     },
   },
@@ -413,7 +328,7 @@ export const PAINTINGS = [
     id: 'markov',
     title: 'The Chain-Serpent',
     sub: 'PANEL VIII · charcoal, faded ochre substrate · c. 1913 (A. A. Markov reads “Eugene Onegin”)',
-    body: 'The oldest painting in the gallery, made before the others by some seventeen winters. A serpent of linked rings — some filled, some hollow, as the letters of the poem were vowel or consonant — and above them the leaping arrows of passage, thick where the crossing is likely, thin where it is rare. The head is drawn looking back at exactly one link. This is the whole doctrine of the serpent: to know where it goes, you need only know where it stands, never where it has been. The faint rows beneath are the twenty thousand letters of Pushkin that Markov counted, by hand, in the winter of Petersburg, to prove it.',
+    body: 'The oldest painting in the gallery, made before the others by some thirty-five winters. A serpent of linked rings — some filled, some hollow, as the letters of the poem were vowel or consonant — and above them the leaping arrows of passage, thick where the crossing is likely, thin where it is rare. The head is drawn looking back at exactly one link. This is the whole doctrine of the serpent: to know where it goes, you need only know where it stands, never where it has been. The faint rows beneath are the twenty thousand letters of Pushkin that Markov counted, by hand, in the winter of Petersburg, to prove it.',
     w: 1300, aspect: 1.8, size: [3.2, 1.78], seed: 81,
     draw(g) {
       const ar = g.W / g.H;
@@ -550,7 +465,7 @@ export const PAINTINGS = [
     id: 'hamming',
     title: 'The Ox That Walks Though a Leg Be Broken',
     sub: 'PANEL XI · charcoal, red ochre correction · c. 1950 (Hamming codes, Bell Laboratories)',
-    body: 'A pack-ox of seven legs: four bear the load (drawn solid); three, hollow, carry nothing — they are witnesses, placed at the first, second and fourth stations, each sworn to watch a different overlapping set of its solid brothers. When the storm of the river-panel breaks one leg (see the fifth, snapped), the witnesses vote, the odd tallies above name the exact culprit, and the leg is redrawn in red before the ox has finished stumbling. Hamming built this animal out of fury, it is said, after a weekend calculator run died at hour forty for one flipped bit with no witness to name it.',
+    body: 'A pack-ox of seven legs: four bear the load (drawn solid); three, hollow, carry nothing — they are witnesses, placed at the first, second and fourth stations, each sworn to watch a different overlapping set of its solid brothers. When the storm of the river-panel breaks one leg (see the fifth, snapped), the witnesses vote, the odd tallies above name the exact culprit, and the leg is redrawn in red before the ox has finished stumbling. Hamming built this animal out of fury, it is said, after the relay calculators at Bell Labs kept abandoning his weekend jobs the moment they detected an error they could not name.',
     w: 1000, aspect: 1.3, size: [2.3, 1.77], seed: 111,
     draw(g) {
       const ar = g.W / g.H;
@@ -769,7 +684,7 @@ export const PAINTINGS = [
     id: 'xor',
     title: 'The Shaft Scene: the Ordeal of the Perceptron',
     sub: 'PANEL XVI · charcoal, rust wash · 1958–1969 (Rosenblatt; then Minsky & Papert, “Perceptrons”)',
-    body: 'The deepest painting in the cave, and its most solemn. The disc-headed figure is the Perceptron, firstborn of the learning machines. At its birth the criers promised it would walk, speak, see and reproduce; the Navy paid. It learned truly — but only what a single straight spear can divide. On the bison’s flank the four terrible dots: same-diagonal filled, other-diagonal hollow. EITHER-OR-BUT-NOT-BOTH. No straight spear divides them; see it snap. The book that proved this froze the fires of an entire age (the elders call it the Long Winter). The figure is drawn falling, not dead — consult the far wall. The bird on the staff appears in the original Shaft at Lascaux also; its meaning is disputed there too, and we see no reason to break with tradition.',
+    body: 'The deepest painting in the cave, and its most solemn. The disc-headed figure is the Perceptron, firstborn of the learning machines. At its birth the criers promised it would walk, speak, see and reproduce; the Navy paid. It learned truly — but only what a single straight spear can divide. On the bison’s flank the four terrible dots: same-diagonal filled, other-diagonal hollow. EITHER-OR-BUT-NOT-BOTH. No straight spear divides them; see it snap. The book that proved this froze the fires of an entire age (the elders call it the Long Winter). The figure is drawn falling, not dead — consult the next wall. The bird on the staff appears in the original Shaft at Lascaux also; its meaning is disputed there too, and we see no reason to break with tradition.',
     w: 1500, aspect: 1.9, size: [4.1, 2.15], seed: 161,
     draw(g) {
       const ar = g.W / g.H;
@@ -848,7 +763,7 @@ export const PAINTINGS = [
     id: 'backprop',
     title: 'The Return',
     sub: 'PANEL XVII · charcoal, red ochre · c. 1986 (Rumelhart, Hinton & Williams, in “Nature”)',
-    body: 'The facing wall answers the Shaft. The disc-headed figure stands again — and where it had one disc it now has three, tier upon tier, joined by many sinews. The red marks run BACKWARD down the sinews: that is the whole spell. The figure errs at the top, and the blame for the error flows back through every joint, each sinew shifting by its share, the hidden middle tier learning what no one could teach it directly. The spear that killed its ancestor cannot kill this one; a bent blade cuts where a straight one could not. Below, the valley: the figure descends it blind, feeling for the slope, settling where the ground stops falling. The elders note the valley has many bottoms, and the figure settles in whichever it reaches first, and that this, mysteriously, is usually good enough.',
+    body: 'The next wall answers the Shaft. The disc-headed figure stands again — and where it had one disc it now has three, tier upon tier, joined by many sinews. The red marks run BACKWARD down the sinews: that is the whole spell. The figure errs at the top, and the blame for the error flows back through every joint, each sinew shifting by its share, the hidden middle tier learning what no one could teach it directly. The spear that killed its ancestor cannot kill this one; a bent blade cuts where a straight one could not. Below, the valley: the figure descends it blind, feeling for the slope, settling where the ground stops falling. The elders note the valley has many bottoms, and the figure settles in whichever it reaches first, and that this, mysteriously, is usually good enough.',
     w: 1000, aspect: 1.2, size: [2.4, 2.0], seed: 171,
     draw(g) {
       const ar = g.W / g.H;
@@ -903,7 +818,7 @@ export const PAINTINGS = [
     id: 'loom',
     title: 'The Loom of Memory',
     sub: 'CEILING PANEL · charcoal, red ochre · c. 1949–1975 (magnetic-core memory)',
-    body: 'Painted overhead, in the weavers’ position. A lattice of rings, each threaded by three sinews, each ring magnetized one way or the other — a filled ring remembers ONE, a hollow ring remembers NOTHING, and the whole sky of them remembers everything the machine knows. For a quarter of a century all computer memory was made this way: by hand, ring by ring, wire by wire, mostly by women, with steady fingers and textile patience. The programs that steered Apollo to the Moon were woven so, and the engineers called it little-old-lady memory, and the Moon was reached on needlework. Note the diagonal sense-wire: to read a ring, the machine must try to flip it — every act of remembering erases, and what is read must at once be rewoven. The painters put it on the ceiling because that is where one looks when trying to recall something.',
+    body: 'Painted overhead, in the weavers’ position. A lattice of rings, each threaded by three sinews, each ring magnetized one way or the other — a filled ring remembers ONE, a hollow ring remembers NOTHING, and the whole sky of them remembers everything the machine knows. For a quarter of a century nearly all computer main memory was made this way: by hand, ring by ring, wire by wire, mostly by women, with steady fingers and textile patience. The programs that steered Apollo to the Moon were woven so, and the engineers called it little-old-lady memory, and the Moon was reached on needlework. Note the diagonal sense-wire: to read a ring, the machine must try to flip it — every act of remembering erases, and what is read must at once be rewoven. The painters put it on the ceiling because that is where one looks when trying to recall something.',
     w: 1150, aspect: 1.35, size: [2.7, 2.0], seed: 191, maxD: 6.5,
     draw(g) {
       const ar = g.W / g.H;
@@ -975,6 +890,10 @@ export const PAINTINGS = [
       g.line(0.66, 0.94, 0.9, 0.94, { color: 'char', w: 3, alpha: 0.5, wobble: 0.05, dry: 0.05 });
     },
   },
+
+  // the newer wings live in their own files
+  ...EARLY_PANELS,
+  ...LATE_PANELS,
 ];
 
 // ------------------------------------------------------------------ the bake

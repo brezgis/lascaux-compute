@@ -113,7 +113,10 @@ export function makePainter(ctx, W, H, seed = 1) {
     for (let s = 0; s < 8; s++) {
       const c = document.createElement('canvas');
       c.width = c.height = 48;
-      const x = c.getContext('2d');
+      // CPU-backed like the panel canvas it is stamped into: a GPU sprite
+      // drawn into a CPU canvas costs a readback per daub (tens of seconds
+      // over the whole cave on some GPUs)
+      const x = c.getContext('2d', { willReadFrequently: true });
       const col = jitterColor(rgb, rng, 10);
       const blobs = 2 + ((rng() * 2) | 0);
       for (let b = 0; b < blobs; b++) {
@@ -286,9 +289,11 @@ export function makePainter(ctx, W, H, seed = 1) {
 
   // patchy interior fill bounded by a closed normalized path
   function wash(pts, opts = {}) {
-    const { color = 'red', alpha = 0.13, density = 1, w = 13 } = opts;
+    const { color = 'red', alpha = 0.13, density = 1, w = 13, poly = false } = opts;
     const sprites = daubSprites(color);
-    const px = resample(pts.map((p) => [X(p[0]), Y(p[1])]), 4);
+    // poly: keep straight edges and sharp corners (boxes, cells, boards)
+    const raw = pts.map((p) => [X(p[0]), Y(p[1])]);
+    const px = poly ? raw : resample(raw, 4);
     const path = new Path2D();
     px.forEach((p, i) => (i ? path.lineTo(p[0], p[1]) : path.moveTo(p[0], p[1])));
     path.closePath();
@@ -340,6 +345,49 @@ export function makePainter(ctx, W, H, seed = 1) {
     return out;
   }
 
+  // engraving: a line scratched into the rock rather than painted on it —
+  // a pale fresh-rock groove with a hairline of shadow along its lower lip.
+  function engrave(pts, opts = {}) {
+    const { w = 4, alpha = 0.6 } = opts;
+    const off = Math.max(1, w * 0.45);
+    const shadow = pts.map(([x, y]) => [x + off * 0.4 / W, y + off / H]);
+    stroke(shadow, { color: 'char', w: w * 0.8, alpha: alpha * 0.55, wobble: 0.2, dry: 0.3, taper: 0.8 });
+    stroke(pts, { color: 'white', w, alpha, wobble: 0.2, dry: 0.2, taper: 0.8 });
+  }
+
+  // finger flutings: several parallel grooves drawn at once by the fingers
+  // of one hand through soft moonmilk
+  function flute(pts, opts = {}) {
+    const { fingers = 3, gap = 9, color = 'white', w = 5, alpha = 0.4 } = opts;
+    for (let f = 0; f < fingers; f++) {
+      const o = (f - (fingers - 1) / 2) * gap;
+      const shifted = pts.map((p, i) => {
+        const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+        let tx = (b[0] - a[0]) * W, ty = (b[1] - a[1]) * H;
+        const L = Math.hypot(tx, ty) || 1; tx /= L; ty /= L;
+        return [p[0] - (ty * o) / W, p[1] + (tx * o) / H];
+      });
+      stroke(shifted, { color, w: w * (0.8 + rng() * 0.4), alpha: alpha * (0.7 + rng() * 0.3), wobble: 0.3, dry: 0.3, taper: 0.9 });
+    }
+  }
+
+  // positive print: pigment daubed over a whole Path2D (px coords), the way
+  // a paint-loaded palm leaves its own shape
+  function printPath(path, opts = {}) {
+    const { color = 'red', alpha = 0.55, w = 10, bbox = null } = opts;
+    const sprites = daubSprites(color);
+    ctx.save();
+    ctx.clip(path);
+    const [x0, y0, x1, y1] = bbox || [0, 0, W, H];
+    for (let y = y0; y <= y1; y += w * 0.6) {
+      for (let x = x0; x <= x1; x += w * 0.6) {
+        if (!ctx.isPointInPath(path, x, y)) continue;
+        stamp(sprites, x + (rng() - 0.5) * w, y + (rng() - 0.5) * w, w * (0.5 + rng() * 0.4), alpha * (0.6 + rng() * 0.5), rng() * 6.28);
+      }
+    }
+    ctx.restore();
+  }
+
   // weathering pass: erode alpha with fbm so pigment sits *in* the rock.
   function weather(amount = 1) {
     const img = ctx.getImageData(0, 0, W, H);
@@ -364,6 +412,7 @@ export function makePainter(ctx, W, H, seed = 1) {
   return {
     rng, nz, W, H, ctx,
     stroke, line, ring, circle, dot, dots, arrow, spray, wash, glyphs, weather,
+    engrave, flute, printPath,
     X, Y,
   };
 }

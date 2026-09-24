@@ -12,28 +12,36 @@ import { LAYOUT, castRay } from './cave.js';
 // how crowded each chamber gets
 const CHAMBER_DENSITY = {
   vestibule: 9, hall: 30, rotunda: 11, shaft: 9, nave: 25, apse: 5,
+  ancients: 10, engines: 11, scriptorium: 10, sand: 9, hand: 11, arena: 12, thaw: 12, net: 4,
 };
 const TUBE_PER_SEG = 4;
 
-export function scatterPaintings({ sdf, caveMesh, scene, avoid }) {
-  const rng = mulberry32(20260702);
-
-  // ---- triangle-subset proxy for fast decal projection
+// Decal projection against a local triangle subset of the cave mesh. The
+// full mesh is hundreds of thousands of triangles; DecalGeometry clips every
+// one of them, so projecting against only the triangles near the anchor makes
+// each decal cheap. Shared by the plaqued panels (main.js) and the crowd.
+export function makeDecalProjector(caveMesh) {
   const posArr = caveMesh.geometry.attributes.position.array;
   const normArr = caveMesh.geometry.attributes.normal.array;
   const idx = caveMesh.geometry.index.array;
+  // triangle centroids, computed once
+  const cen = new Float32Array(idx.length);
+  for (let t = 0; t < idx.length; t += 3) {
+    const a = idx[t] * 3, b = idx[t + 1] * 3, c = idx[t + 2] * 3;
+    cen[t] = (posArr[a] + posArr[b] + posArr[c]) / 3;
+    cen[t + 1] = (posArr[a + 1] + posArr[b + 1] + posArr[c + 1]) / 3;
+    cen[t + 2] = (posArr[a + 2] + posArr[b + 2] + posArr[c + 2]) / 3;
+  }
   const proxy = new THREE.Mesh(new THREE.BufferGeometry());
-  function decalGeometryFast(pos, orientation, size) {
+
+  function project(pos, orientation, size) {
     const r = size.length() * 0.8 + 0.6;
     const r2 = r * r;
     const p = [], n = [];
     for (let t = 0; t < idx.length; t += 3) {
-      const a = idx[t] * 3, b = idx[t + 1] * 3, c = idx[t + 2] * 3;
-      const cx = (posArr[a] + posArr[b] + posArr[c]) / 3 - pos.x;
-      const cy = (posArr[a + 1] + posArr[b + 1] + posArr[c + 1]) / 3 - pos.y;
-      const cz = (posArr[a + 2] + posArr[b + 2] + posArr[c + 2]) / 3 - pos.z;
+      const cx = cen[t] - pos.x, cy = cen[t + 1] - pos.y, cz = cen[t + 2] - pos.z;
       if (cx * cx + cy * cy + cz * cz > r2) continue;
-      for (const v of [a, b, c]) {
+      for (const v of [idx[t] * 3, idx[t + 1] * 3, idx[t + 2] * 3]) {
         p.push(posArr[v], posArr[v + 1], posArr[v + 2]);
         n.push(normArr[v], normArr[v + 1], normArr[v + 2]);
       }
@@ -46,7 +54,10 @@ export function scatterPaintings({ sdf, caveMesh, scene, avoid }) {
     return new DecalGeometry(proxy, pos, orientation, size);
   }
 
-  function filterFacing(geo, normal) {
+  // keep only triangles that actually face the projector — kills the black
+  // shards from geometry caught on the far side of thin rock
+  function filterFacing(geo, normal, minDot = 0.35) {
+    if (!geo.attributes.position) return null;
     const p = geo.attributes.position.array;
     const n = geo.attributes.normal.array;
     const uv = geo.attributes.uv.array;
@@ -58,11 +69,12 @@ export function scatterPaintings({ sdf, caveMesh, scene, avoid }) {
         facing += n[o] * normal.x + n[o + 1] * normal.y + n[o + 2] * normal.z;
         if (!Number.isFinite(p[o]) || !Number.isFinite(p[o + 1]) || !Number.isFinite(p[o + 2])) finite = false;
       }
-      if (!finite || facing < 0.35 * 3) continue; // mean dot < 0.35 → discard
+      if (!finite || facing < minDot * 3) continue;
       for (let v = 0; v < 9; v++) { P.push(p[t + v]); N.push(n[t + v]); }
       const u0 = (t / 9) * 6;
       for (let v = 0; v < 6; v++) UV.push(uv[u0 + v]);
     }
+    geo.dispose();
     if (P.length === 0) return null;
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
@@ -70,6 +82,13 @@ export function scatterPaintings({ sdf, caveMesh, scene, avoid }) {
     g.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2));
     return g;
   }
+
+  return { project, filterFacing };
+}
+
+export function scatterPaintings({ sdf, caveMesh, scene, avoid, projector }) {
+  const rng = mulberry32(20260702);
+  const { project: decalGeometryFast, filterFacing } = projector || makeDecalProjector(caveMesh);
 
   // ---- sampling sites
   const sites = [];
@@ -131,7 +150,9 @@ export function scatterPaintings({ sdf, caveMesh, scene, avoid }) {
       // keep off the plaqued panels; loose among ourselves (Lascaux overlaps)
       let ok = true;
       for (const a of avoid) {
-        if (hit.pos.distanceTo(a.pos) < 2.2 + w * 0.5) { ok = false; break; }
+        // clear of the whole panel, not just its centre (the big ones are 4 m+)
+        const keep = Math.max(2.2, Math.hypot(a.painting.size[0], a.painting.size[1]) * 0.5 + 0.35);
+        if (hit.pos.distanceTo(a.pos) < keep + w * 0.5) { ok = false; break; }
       }
       if (ok) {
         for (const p of placed) {
@@ -162,9 +183,7 @@ export function scatterPaintings({ sdf, caveMesh, scene, avoid }) {
       }
 
       let geo = decalGeometryFast(hit.pos, helper.rotation, new THREE.Vector3(w, h, 1.3));
-      if (!geo.attributes.position || geo.attributes.position.count === 0) continue;
-      // keep only triangles that actually face the projector — kills the
-      // black shards from geometry caught on the far side of thin rock
+      if (!geo.attributes.position || geo.attributes.position.count === 0) { geo.dispose(); continue; }
       geo = filterFacing(geo, hit.normal);
       if (!geo) continue;
       const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
