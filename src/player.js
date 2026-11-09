@@ -19,6 +19,7 @@ export function makePlayer(camera, sdf, dom) {
 
   const state = {
     pos, locked: false, moving: false, active: true, speed: 0, onStep: null,
+    walked: 0, looked: false,         // has the visitor found their feet and eyes yet
     get yaw() { return yaw; },
     set(x, z, yw) {
       pos.x = x; pos.z = z; yaw = yw;
@@ -30,6 +31,7 @@ export function makePlayer(camera, sdf, dom) {
   // ---------- look
   function onMouseMove(e) {
     if (!state.locked) return;
+    if (Math.abs(e.movementX) + Math.abs(e.movementY) > 2) state.looked = true;
     yaw -= e.movementX * 0.0023;
     pitch -= e.movementY * 0.0021;
     pitch = Math.max(-1.45, Math.min(1.45, pitch));
@@ -65,6 +67,7 @@ export function makePlayer(camera, sdf, dom) {
         walkVec.x = Math.max(-1, Math.min(1, (t.clientX - walkTouch.x0) / 60));
         walkVec.y = Math.max(-1, Math.min(1, (t.clientY - walkTouch.y0) / 60));
       } else if (lookTouch && t.identifier === lookTouch.id) {
+        state.looked = true;
         yaw -= (t.clientX - lookTouch.x) * 0.005;
         pitch -= (t.clientY - lookTouch.y) * 0.004;
         pitch = Math.max(-1.45, Math.min(1.45, pitch));
@@ -112,6 +115,7 @@ export function makePlayer(camera, sdf, dom) {
     if (vx !== 0 && passable(pos.x + vx, pos.y, pos.z)) pos.x += vx;
     if (vz !== 0 && passable(pos.x, pos.y, pos.z + vz)) pos.z += vz;
     const moved = Math.hypot(pos.x - x0, pos.z - z0);   // real ground covered
+    state.walked += moved;
 
     // soft push-out if the walls have crept too close (noise pockets)
     const here = sdf.sample(pos.x, pos.y - 0.4, pos.z);

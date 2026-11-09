@@ -52,7 +52,7 @@ const grid = document.getElementById('grid');
 for (const p of PAINTINGS) {
   if (only && !only.includes(p.id)) continue;
   const t0 = performance.now();
-  const art = bakePainting(p, scale);
+  const art = bakePainting(p, scale).canvas;
   const ms = (performance.now() - t0).toFixed(0);
   const c = document.createElement('canvas');
   c.width = art.width; c.height = art.height;

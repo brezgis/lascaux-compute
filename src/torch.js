@@ -4,8 +4,8 @@
 //
 // The flicker is smoothed noise rather than sines (sines read as a pulse),
 // with the occasional gust that pulls the flame low and red. The light sits
-// in the flame itself, falls off a little gentler than inverse-square so the
-// far wall of a big chamber still catches it, and throttles itself when the
+// in the flame itself, falls off a little gentler than inverse-square (the
+// far wall of a big chamber just catches it), and throttles itself when the
 // flame is held close to rock, the way your eye would stop down.
 
 import * as THREE from 'three';
@@ -62,21 +62,19 @@ function makeNoise1(seed) {
   };
 }
 
-const HOT = new THREE.Color(0xffb266);   // steady flame
+const HOT = new THREE.Color(0xffbc80);   // steady flame
 const LOW = new THREE.Color(0xff7a2e);   // guttering: redder, as a dimming flame is
+const LUMEN = 34;
 
 export function makeTorch(camera, scene) {
   // --- the light that carries the scene
-  const light = new THREE.PointLight(0xffa050, 42, 28, 1.6);
+  const light = new THREE.PointLight(0xffb070, 0, 26, 1.75);
   scene.add(light);
-  // faint bounce so full darkness never swallows geometry
-  const fill = new THREE.PointLight(0xff9040, 3, 7, 2.0);
-  scene.add(fill);
 
   // --- held prop, child of camera
   const rig = new THREE.Group();
   camera.add(rig);
-  rig.position.set(0.34, -0.34, -0.62);
+  rig.position.set(0.36, -0.4, -0.62);
 
   // basic (unlit) materials: the torch is a silhouette against its own light.
   const stickGroup = new THREE.Group();
@@ -84,21 +82,21 @@ export function makeTorch(camera, scene) {
   rig.add(stickGroup);
 
   const stick = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.014, 0.02, 0.42, 7),
+    new THREE.CylinderGeometry(0.012, 0.017, 0.42, 12),
     new THREE.MeshBasicMaterial({ color: 0x1c1208 }),
   );
   stickGroup.add(stick);
 
   // the wrapped head: charred, with a glowing lip where it burns
   const head = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.025, 0.018, 0.09, 8),
+    new THREE.CylinderGeometry(0.022, 0.016, 0.08, 16),
     new THREE.MeshBasicMaterial({ color: 0x3a1c0c }),
   );
   head.position.set(0, 0.235, 0);
   stickGroup.add(head);
   const ember = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.026, 0.024, 0.018, 8),
-    new THREE.MeshBasicMaterial({ color: 0xff6a1c }),
+    new THREE.CylinderGeometry(0.023, 0.022, 0.016, 16),
+    new THREE.MeshBasicMaterial({ color: 0xc8501c }),
   );
   ember.position.set(0, 0.28, 0);
   stickGroup.add(ember);
@@ -154,8 +152,16 @@ export function makeTorch(camera, scene) {
 
   let flicker = 1, gust = 0, lean = 0, dim = 1;
 
+  // the torch starts unlit; kindle() lights it over a second or so
+  let ignite = 0, igniting = false;
+
   // opts.wallDist: distance from the flame to the nearest rock (m)
   function update(t, dt, opts = {}) {
+    if (igniting) ignite = Math.min(1, ignite + dt / 1.3);
+    const kindle = ignite * ignite * (3 - 2 * ignite);
+    // the torch is raised into view as it catches
+    rig.visible = ignite > 0;
+    rig.position.y = -0.4 - 0.3 * (1 - kindle);
     // flicker: three octaves of smoothed noise; a slow "breath", a lively
     // mid band and a fine shimmer. Gusts come rarely and pull it down.
     const g = nG(t * 0.35);
@@ -169,12 +175,11 @@ export function makeTorch(camera, scene) {
 
     // held close to rock, the light stops down (up to ~half), smoothly
     const wd = opts.wallDist === undefined ? 3 : opts.wallDist;
-    const k = Math.max(0, Math.min(1, (wd - 0.25) / 1.4));
-    const dimTarget = 0.5 + 0.5 * k * k * (3 - 2 * k);
+    const k = Math.max(0, Math.min(1, (wd - 0.25) / 1.8));
+    const dimTarget = 0.45 + 0.55 * k * k * (3 - 2 * k);
     dim += (dimTarget - dim) * Math.min(1, dt * 4);
 
-    light.intensity = 42 * flicker * dim;
-    fill.intensity = 3 * flicker;
+    light.intensity = LUMEN * flicker * dim * kindle;
     light.color.copy(LOW).lerp(HOT, Math.max(0, Math.min(1, (flicker - 0.72) / 0.3)));
 
     // the light lives in the flame, and wanders with it by a few centimetres
@@ -186,7 +191,6 @@ export function makeTorch(camera, scene) {
       tip.y + (nB(t * 4 + 9) - 0.5) * 0.04,
       tip.z + (nZ(t * 3) - 0.5) * 0.05,
     );
-    fill.position.copy(camera.position);
 
     // the flame leans against the way you are moving
     camVel.subVectors(camera.position, lastCam).divideScalar(Math.max(dt, 1e-3));
@@ -199,15 +203,16 @@ export function makeTorch(camera, scene) {
       const f = flames[i];
       const w = 0.05 + i * 0.022;
       const hN = nB(t * (7 + i * 2.3) + i * 17);
+      const grow = 0.25 + 0.75 * kindle;
       f.scale.set(
-        w * (0.88 + 0.24 * nC(t * 11 + i * 5)),
-        w * (2.3 + 0.9 * hN) * (0.75 + 0.35 * flicker),
+        w * (0.88 + 0.24 * nC(t * 11 + i * 5)) * grow,
+        w * (2.3 + 0.9 * hN) * (0.75 + 0.35 * flicker) * grow,
         1,
       );
       f.material.rotation = lean + (nA(t * (3 + i) + i * 31) - 0.5) * 0.3;
       f.material.opacity = 0.75 + 0.25 * flicker;
     }
-    halo.material.opacity = 0.32 + 0.25 * flicker;
+    halo.material.opacity = (0.32 + 0.25 * flicker) * kindle;
     const hs = 0.3 + 0.06 * flicker;
     halo.scale.set(hs, hs, 1);
 
@@ -230,10 +235,14 @@ export function makeTorch(camera, scene) {
       pos[i * 3 + 2] += vel[i * 3 + 2] * dt + (Math.random() - 0.5) * 0.003;
     }
     emberGeo.attributes.position.needsUpdate = true;
-    embers.material.opacity = 0.55 * flicker;
+    embers.material.opacity = 0.55 * flicker * kindle;
 
-    return flicker;
+    return flicker * kindle;
   }
 
-  return { light, update, rig };
+  return {
+    light, update, rig,
+    kindle() { igniting = true; },
+    kindleNow() { igniting = true; ignite = 1; },
+  };
 }

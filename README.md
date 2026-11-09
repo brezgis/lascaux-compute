@@ -42,8 +42,9 @@ no single right way round):
 | The Arena | the beast that played itself (Samuel's checkers, 1959), the two paddles (Spacewar! and Pong), the giant and the champion (Deep Blue, 1997), move 37 (AlphaGo, 2016) |
 | The Apse (through the crawl) | two recent intrusions, cataloging disputed: attention (2017) and the many-headed guesser (GPT, 2018–2020) |
 
-Stand before a painting and its field-report plaque surfaces. Every plaque is
-lore-flavored but historically load-bearing: dates, names, and anecdotes check
+Stand before a painting and its plaque surfaces: a title, a date, and two or
+three sentences in the voice of an archaeologist who half-believes the myth.
+Every plaque is historically load-bearing: dates, names, and anecdotes check
 out (the moth, the Hansard, the dog).
 
 Beyond the plaqued panels, ~300 lesser figures crowd the walls and ceilings,
@@ -60,9 +61,12 @@ centuries of other painters.
 - **mouse** — torch & gaze
 - **M** — survey map (tracks which panels you have read)
 - **N** — sound on/off
-- **mouse wheel** — scrolls a long plaque
-- **touch** — left half of screen walks, right half looks; MAP and SOUND
-  buttons sit top right, and a long plaque scrolls with a finger
+- **touch** — left half of screen walks, right half looks; Map and Sound
+  buttons sit top right
+
+The game teaches the first two itself, with a hint that fades once you have
+walked and looked; the map and sound keys are mentioned once, in the second
+chamber.
 
 ## Running
 
@@ -75,9 +79,18 @@ python3 -m http.server 8000
 ```
 
 Deploy = copy the directory (or push to GitHub Pages). Everything is
-self-contained: three.js is vendored in `vendor/`, all art, audio and geometry
-are synthesized at load. No build step, no assets, no network calls.
-Total payload is ~1.4 MB raw, mostly three.js (~300 KB gzipped on the wire).
+self-contained: three.js is vendored in `vendor/`, the Alegreya typeface
+(SIL OFL, `fonts/`) is self-hosted, and all art, audio and geometry are
+synthesized at load. No build step, no image assets, no network calls.
+Total payload is ~1.5 MB raw, mostly three.js (~300 KB gzipped on the wire).
+
+The title is clickable about half a second after load: only the rock, the
+field and the decal geometry are built before it. The 55 panels and the 75
+lesser-figure bakes are painted afterwards in a pool of module workers
+(`src/baker.js`, `src/bake-worker.js`; OffscreenCanvas), panels nearest the
+visitor first, and fade up on the rock as they arrive, usually before you
+reach the first one. Browsers without OffscreenCanvas paint on the main
+thread in idle time instead.
 
 ## How it works
 
@@ -92,7 +105,10 @@ Total payload is ~1.4 MB raw, mostly three.js (~300 KB gzipped on the wire).
 - **The paintings** (`src/paint.js`; panels in `src/paintings.js`,
   `src/panels-early.js`, `src/panels-late.js`; shared figures in
   `src/forms.js`) — every panel is stroke-authored and rendered at load
-  through a pigment engine: strokes become chains of overlapping finger-daubs
+  through a pigment engine (resolution-independent: widths and noise are in
+  the panel's authored units, so a panel baked at 450 texels per metre for a
+  retina screen looks the same as one baked smaller for a phone, only
+  sharper): strokes become chains of overlapping finger-daubs
   with wobble, taper, width jitter and dry-brush gaps, then a weathering pass
   erodes the pigment with noise so it sits *in* the rock. Hand stencils are
   spatter-sprayed around Path2D masks; positive prints are daubed inside them;
@@ -105,7 +121,8 @@ Total payload is ~1.4 MB raw, mostly three.js (~300 KB gzipped on the wire).
 - **The torch** (`src/torch.js`) — a point light that lives in the flame,
   flickering on smoothed noise (with the odd gust that pulls it low and red),
   falling off a little gentler than inverse-square, and stopping down when
-  held close to rock so near walls don't blow out. Teardrop sprite flames
+  held close to rock so near walls don't blow out. It starts unlit; clicking
+  the title kindles it. Teardrop sprite flames
   that lean against your motion, a soft halo, drifting embers.
 - **The sound** (`src/audio.js`) — synthesized from nothing: brown-noise wind
   breathing through a lowpass, the torch's low roar and resin snaps, a rare
@@ -120,7 +137,9 @@ Total payload is ~1.4 MB raw, mostly three.js (~300 KB gzipped on the wire).
 - `motif-lab.html` — the same for the scattered lesser figures
   (`src/motifs.js`), three variants of each.
 - `index.html?shot=<panel-id>` or `?shot=x,z,yaw[,pitch]` — positions the
-  camera for headless screenshots; `?map=1` opens the survey map.
+  camera for headless screenshots (`window.__shotReady` turns true once
+  everything is painted); `?map=1` opens the survey map. Load timings are in
+  `window.__grotte`.
 - To run the walkability simulation or other field tests in Node, give it a
   `three` package pointing at the vendored build:
   ```

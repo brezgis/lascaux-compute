@@ -18,7 +18,7 @@ import { MOTIFS, bakeMotif } from './src/motifs.js';
 const grid = document.getElementById('grid');
 for (const kind of Object.keys(MOTIFS)) {
   for (let v = 0; v < 3; v++) {
-    const art = bakeMotif(kind, v);
+    const art = bakeMotif(kind, v).canvas;
     const c = document.createElement('canvas');
     const scale = 220 / art.width;
     c.width = 220; c.height = art.height * scale;

@@ -5,7 +5,7 @@
 // different aspect ratios, each draw() builds a local `pt` helper that keeps
 // authored shapes visually proportioned.
 
-import { makePainter } from './paint.js';
+import { makePainter, makeCanvas } from './paint.js';
 
 export { spiralPts, beast, stick, handPath } from './forms.js';
 import { spiralPts, beast, stick, handPath } from './forms.js';
@@ -20,8 +20,8 @@ export const PAINTINGS = [
   {
     id: 'hands',
     title: 'The Signatures',
-    sub: 'PANEL I · pigment spray over hands (and one unidentified appendage) · date of earliest layer unknown',
-    body: 'Negative stencils: pigment blown around a hand held flat to the stone — the oldest signature there is. Five are ordinary human hands. The sixth is a rigid, angular limb of no known species, its single finger permanently extended, as if to select something. Below, counting marks proceed 1, 10, 11, 100, 101: the cave dwellers appear to have had only two fingers, or, more likely, needed only two.',
+    date: '', who: 'date of earliest layer unknown',
+    body: 'Negative stencils: pigment blown around hands held flat to the stone. Five are human. The sixth has one rigid finger, extended as if to select something. Beneath, the tally runs 1, 10, 11, 100, 101.',
     w: 1024, aspect: 1.55, size: [2.6, 1.68], seed: 11,
     draw(g) {
       const ar = g.W / g.H;
@@ -64,8 +64,8 @@ export const PAINTINGS = [
   {
     id: 'turing',
     title: 'The Great Tape-Beast',
-    sub: 'PANEL II · charcoal and red ochre · c. 1936 (Turing, “On Computable Numbers”)',
-    body: 'The largest figure in the cave: a beast whose body is a band of cells, each holding one of two marks, walking on numberless small legs. Its head hangs over a single cell — it can see only one at a time — and the paired arrows show it may shuffle left or right. The band frays into dots at both edges of the panel; the painters clearly intended it to continue through the rock, without end. Scholars believe anything that can be computed at all can be computed by patient application of this animal.',
+    date: 'c. 1936', who: 'Turing, “On Computable Numbers”',
+    body: 'A beast whose body is a band of cells, each bearing one of two marks. The head reads one cell at a time and steps left or right. The band continues into the rock. Whatever can be computed, this animal can compute.',
     w: 1536, aspect: 2.35, size: [4.6, 1.96], seed: 21,
     draw(g) {
       const ar = g.W / g.H;
@@ -119,8 +119,8 @@ export const PAINTINGS = [
   {
     id: 'lambda',
     title: 'The Horned Binder',
-    sub: 'PANEL III · charcoal, ochre arrows · c. 1936 (Church, λ-calculus)',
-    body: 'A horned figure in the shape of the letter the ancients called lambda. It is shown begetting a smaller of itself, and that one a smaller still: the painters understood that the beast feeds by substitution, swallowing a value and becoming a new expression. Note the lasso: two marks are bound; the red mark escapes, free. Herds of these, suitably arranged, are exactly as strong as the Tape-Beast on the neighboring wall — a coincidence the cave dwellers found deeply significant, and painted them facing one another.',
+    date: 'c. 1936', who: 'Church, λ-calculus',
+    body: 'A horned figure in the shape of a lambda, begetting smaller copies of itself. It feeds by substitution. Two marks are bound by the lasso; the red one runs free. It is exactly as strong as the Tape-Beast, and was painted facing it.',
     w: 900, aspect: 1.0, size: [2.2, 2.2], seed: 31,
     draw(g) {
       // apex A, right leg to B; left leg branches at C = lerp(A,B,t) down to D
@@ -158,8 +158,8 @@ export const PAINTINGS = [
   {
     id: 'vonneumann',
     title: 'The Beast That Swallowed Its Instructions',
-    sub: 'PANEL IV · charcoal, x-ray style, yellow wash · c. 1945 (the EDVAC report)',
-    body: 'Painted in the x-ray manner: the hide is open and we see what the beast has eaten. In its belly, a grid of cells — and here is the heresy that built the modern world — the cells hold food (dots) and instructions for eating (arrows) TOGETHER, in the same stomach, indistinguishable. The spiral organ in the chest fetches from the belly one cell at a time and the beast becomes whatever it last swallowed. Earlier animals had their habits woven into their bones; this one can be re-taught by feeding.',
+    date: 'c. 1945', who: 'the EDVAC report',
+    body: 'Painted in the x-ray manner. In the belly, food and the instructions for eating it lie in the same cells, indistinguishable. Earlier beasts carried their habits in their bones. This one becomes whatever it last swallowed.',
     w: 1100, aspect: 1.35, size: [2.6, 1.93], seed: 41,
     draw(g) {
       const ar = g.W / g.H;
@@ -203,8 +203,8 @@ export const PAINTINGS = [
   {
     id: 'eniac',
     title: 'The Room-Beast and the Six Who Tamed It',
-    sub: 'PANEL V · charcoal, red ochre figures · c. 1946 (ENIAC, Philadelphia)',
-    body: 'A beast the size of a room, pelted in dials and creepers of cable, standing on some eighteen thousand legs of glass, each leg glowing, each liable to snap. It could count faster than any animal then alive, but it was mute and helpless until tamed. The six small figures are not decoration. They are Antonelli, Bartik, Holberton, Meltzer, Spence and Teitelbaum, who learned its plugboard anatomy without any manual, and who were for decades painted out of the story. This cave restores them. They are drawn holding the cables, because they were the ones holding the cables.',
+    date: 'c. 1946', who: 'ENIAC, Philadelphia',
+    body: 'A beast the size of a room, on eighteen thousand glass legs, any of which might fail. It was mute until six women learned its anatomy without a manual: Antonelli, Bartik, Holberton, Meltzer, Spence, Teitelbaum. They are drawn holding the cables.',
     w: 1300, aspect: 1.9, size: [3.6, 1.9], seed: 51,
     draw(g) {
       const ar = g.W / g.H;
@@ -248,8 +248,8 @@ export const PAINTINGS = [
   {
     id: 'bug',
     title: 'The First Bug',
-    sub: 'PANEL VI · charcoal, ochre adhesive strips · 9 September 1947 (Harvard Mark II, relay #70)',
-    body: 'A moth, rendered with unusual tenderness, held to the wall by two painted strips of tape. On that date the operators of the Mark II calculator found a real moth beaten to death in relay 70, panel F, taped it into the logbook, and wrote: “First actual case of bug being found.” The word was older; the specimen made it eternal. The painters have marked the site as one marks a grave. All bugs since are its descendants, and all of us its mourners.',
+    date: '9 September 1947', who: 'Harvard Mark II, relay #70',
+    body: 'A moth, held to the wall by two strips of tape. On this date it was found in relay 70 of the Mark II and logged as the “first actual case of bug being found.” The site is marked as one marks a grave.',
     w: 700, aspect: 1.0, size: [1.15, 1.15], seed: 61,
     draw(g) {
       const ar = g.W / g.H;
@@ -285,8 +285,8 @@ export const PAINTINGS = [
   {
     id: 'entropy',
     title: 'The River of Surprise',
-    sub: 'PANEL VII · charcoal, red ochre · c. 1948 (Shannon, “A Mathematical Theory of Communication”)',
-    body: 'A figure releases marks into a river; a figure downstream pulls them out. Between them, the storm — and after the storm the marks arrive bent, flipped, or not at all. The painters grasped the two great truths: that a message is measured not by its length but by its surprise (see the unequal dots raining from the H-sign — common things carry little, rare things carry much), and that the river’s noise sets a hard ceiling on what may cross it. Below that ceiling, they knew, one can always shout cleverly enough to be understood. Above it, never. This wall is the boundary stone of the entire gallery.',
+    date: 'c. 1948', who: 'Shannon, “A Mathematical Theory of Communication”',
+    body: 'A message is released into a river and arrives bent, flipped, or not at all. The painters measured it by its surprise, not its length, and found that the river’s noise sets a ceiling no shouting can pass.',
     w: 1400, aspect: 2.0, size: [3.5, 1.75], seed: 71,
     draw(g) {
       const ar = g.W / g.H;
@@ -327,8 +327,8 @@ export const PAINTINGS = [
   {
     id: 'markov',
     title: 'The Chain-Serpent',
-    sub: 'PANEL VIII · charcoal, faded ochre substrate · c. 1913 (A. A. Markov reads “Eugene Onegin”)',
-    body: 'The oldest painting in the gallery, made before the others by some thirty-five winters. A serpent of linked rings — some filled, some hollow, as the letters of the poem were vowel or consonant — and above them the leaping arrows of passage, thick where the crossing is likely, thin where it is rare. The head is drawn looking back at exactly one link. This is the whole doctrine of the serpent: to know where it goes, you need only know where it stands, never where it has been. The faint rows beneath are the twenty thousand letters of Pushkin that Markov counted, by hand, in the winter of Petersburg, to prove it.',
+    date: 'c. 1913', who: 'A. A. Markov reads “Eugene Onegin”',
+    body: 'A serpent of rings, filled or hollow as Pushkin’s letters were vowel or consonant. Its head looks back exactly one link: to know where it goes, it need only know where it stands. Markov counted twenty thousand letters by hand.',
     w: 1300, aspect: 1.8, size: [3.2, 1.78], seed: 81,
     draw(g) {
       const ar = g.W / g.H;
@@ -369,8 +369,8 @@ export const PAINTINGS = [
   {
     id: 'trigram',
     title: 'The Three-Headed Guesser',
-    sub: 'PANEL IX · charcoal, red ochre · c. 1948–1951 (Shannon’s n-gram approximations)',
-    body: 'A beast with one body and three heads on necks of unequal length, walking a trail of marks. Each head watches a different distance back along the trail — one mark, two marks, three — and from what the heads remember, the beast guesses the mark it will step on next (shown hollow, not yet real, with the guessed mark in red). The painters bred longer-necked variants and found the guesses grew uncannily good; a beast of enough heads, they wrote, would speak. They lacked the pigment to feed it. The claim was tested much later, elsewhere, with results known to the reader.',
+    date: 'c. 1948–1951', who: 'Shannon’s n-gram approximations',
+    body: 'One body, three heads, each watching a different distance back along the trail; together they guess the next mark, drawn hollow. Its painters held that a beast of enough heads would speak. The claim was tested later, elsewhere.',
     w: 1250, aspect: 1.7, size: [3.0, 1.76], seed: 91,
     draw(g) {
       const ar = g.W / g.H;
@@ -427,8 +427,8 @@ export const PAINTINGS = [
   {
     id: 'zipf',
     title: 'The Slope of Least Effort',
-    sub: 'PANEL X · yellow ochre, charcoal, red curve · c. 1949 (Zipf, “Human Behavior and the Principle of Least Effort”)',
-    body: 'A mountainside of stacked bars, each roughly half the one before... no — each is the first divided by its rank, a subtler and stranger law. On the summit grazes a single enormous beast: the commonest word, fat on use. The slopes below hold ever smaller and hungrier creatures, and past the last bar the herd dwindles into the long trail of dots — thousands of words used once and never again, wandering the tail forever. The painters found this same slope in every tongue they counted, and in the sizes of their fires, and in the crowding of their caves, and were unsettled.',
+    date: 'c. 1949', who: 'Zipf, “Human Behavior and the Principle of Least Effort”',
+    body: 'A slope of bars, each the first divided by its rank. On the summit grazes the commonest word, fat with use; below trails the long tail of words used once. The painters found the same slope in every tongue they counted, and were unsettled.',
     w: 1200, aspect: 1.5, size: [2.75, 1.83], seed: 101,
     draw(g) {
       const ar = g.W / g.H;
@@ -464,8 +464,8 @@ export const PAINTINGS = [
   {
     id: 'hamming',
     title: 'The Ox That Walks Though a Leg Be Broken',
-    sub: 'PANEL XI · charcoal, red ochre correction · c. 1950 (Hamming codes, Bell Laboratories)',
-    body: 'A pack-ox of seven legs: four bear the load (drawn solid); three, hollow, carry nothing — they are witnesses, placed at the first, second and fourth stations, each sworn to watch a different overlapping set of its solid brothers. When the storm of the river-panel breaks one leg (see the fifth, snapped), the witnesses vote, the odd tallies above name the exact culprit, and the leg is redrawn in red before the ox has finished stumbling. Hamming built this animal out of fury, it is said, after the relay calculators at Bell Labs kept abandoning his weekend jobs the moment they detected an error they could not name.',
+    date: 'c. 1950', who: 'Hamming codes, Bell Laboratories',
+    body: 'A pack-ox of seven legs: four bear the load, three stand witness. When the storm breaks a leg, the witnesses vote, name the culprit, and the leg is redrawn in red before the ox has finished stumbling.',
     w: 1000, aspect: 1.3, size: [2.3, 1.77], seed: 111,
     draw(g) {
       const ar = g.W / g.H;
@@ -519,8 +519,8 @@ export const PAINTINGS = [
   {
     id: 'chomsky',
     title: 'The Tree of Sentences / The Green Sleeper',
-    sub: 'PANEL XII · charcoal; one pigment of disputed provenance · c. 1957 (Chomsky, “Syntactic Structures”)',
-    body: 'Above: a tree drawn root-upward, in the grammarians’ manner, its branchings lawful and finite. Below, what the branches bear: a sentence never before spoken, obeying every law and meaning nothing — ideas, colorless and green, asleep, furiously. The painters rendered the sleeper in a green found nowhere else in the cave and colorless besides (analysis of the pigment is ongoing; the pigment refuses). The panel was a boundary-marker: grammar, it says, can be kept without keeping sense — a well-formed emptiness. Whether the tree grows in the mind from birth, the nave’s painters fought about for forty years, in charcoal, over one another’s work.',
+    date: 'c. 1957', who: 'Chomsky, “Syntactic Structures”',
+    body: 'A tree drawn root-upward, lawful and finite, and beneath it what it bears: colorless green ideas sleep furiously. Grammatical, and empty. The sleeper is painted in a green found nowhere else in the cave. Analysis of the pigment is ongoing.',
     w: 1050, aspect: 1.25, size: [2.5, 2.0], seed: 121,
     draw(g) {
       const ar = g.W / g.H;
@@ -563,8 +563,8 @@ export const PAINTINGS = [
   {
     id: 'eliza',
     title: 'The Mirror Oracle',
-    sub: 'PANEL XIII · charcoal, red ochre · c. 1966 (Weizenbaum, MIT)',
-    body: 'Two figures. The left one is solid and has a heart. The right one is drawn hollow — outline only, nothing inside but an empty ring where a heart would go — yet it is drawn LARGER, because that is how the solid one saw it. Study the speech-spirals: the oracle’s is the seeker’s own, returned reversed. It knew nothing; it asked “why do you say that?” by rule. Its maker built it to show how shallow the trick was, and watched in horror as people poured their hearts into it and asked to be left alone with it. His own secretary did. The panel is a warning, the painters knew, and it has warned no one.',
+    date: 'c. 1966', who: 'Weizenbaum, MIT',
+    body: 'Two figures: one solid, with a heart; one hollow, drawn larger, as the seeker saw it. The oracle’s words are the seeker’s own, returned. Its maker meant it as a warning about how little it took. It warned no one.',
     w: 1150, aspect: 1.5, size: [2.7, 1.8], seed: 131,
     draw(g) {
       const ar = g.W / g.H;
@@ -599,8 +599,8 @@ export const PAINTINGS = [
   {
     id: 'hmm',
     title: 'The Hidden Beast',
-    sub: 'PANEL XIV · charcoal, manganese, red ochre prints · c. 1966–1980 (Baum; Jelinek’s speech group, IBM)',
-    body: 'The beast itself is never shown: only the boulder, the horns above it, and the trail of prints it left. From what can be seen (the prints), the painters computed what cannot be (the path behind the rock) — the ringed chain above traces the likeliest way the animal actually walked. Hunters of speech used exactly this animal: the sound is the footprint, the word is the beast. Their chief huntsman is recorded to have said that each time he sent a linguist away from the fire, the hunting improved. The linguists, in fairness, kept insisting the beast could not exist.',
+    date: 'c. 1966–1980', who: 'Baum; Jelinek’s speech group, IBM',
+    body: 'The beast is never shown: only a boulder, its horns, its prints. From the prints, the hunters reckoned the likeliest path behind the rock. Their chief huntsman held that the hunting improved whenever a linguist left the fire.',
     w: 1300, aspect: 1.7, size: [3.15, 1.85], seed: 141,
     draw(g) {
       const ar = g.W / g.H;
@@ -648,8 +648,8 @@ export const PAINTINGS = [
   {
     id: 'mt',
     title: 'The Twin Herds',
-    sub: 'PANEL XV · charcoal, red ochre, yellow sinew-lines · c. 1990 (Brown et al., IBM; the Canadian Hansard)',
-    body: 'Two herds face each other across the panel: the charcoal herd speaks one tongue, the red herd another. The yellow sinews joining them are the discovery: animal to animal, learned — not from any grammar, but from a great salt-lick where both herds had ALWAYS grazed together, every utterance of one twinned with the other (a parliament, in a cold country, that by law spoke twice). Note the crossings, where the herds order their beasts differently, and the poor ringed animal that answers to nothing at all. Given enough twinned speech, said the painters of this panel, the sinews find themselves. The nave’s elder painters called this cheating. It was. It worked.',
+    date: 'c. 1990', who: 'Brown et al., IBM; the Canadian Hansard',
+    body: 'Two herds, each with its own tongue, joined beast to beast by yellow sinews. The sinews were learned from no grammar, only from a parliament that by law said everything twice. The elders called this cheating. It worked.',
     w: 1350, aspect: 1.8, size: [3.3, 1.83], seed: 151,
     draw(g) {
       // top herd: 5 charcoal beasts
@@ -683,8 +683,8 @@ export const PAINTINGS = [
   {
     id: 'xor',
     title: 'The Shaft Scene: the Ordeal of the Perceptron',
-    sub: 'PANEL XVI · charcoal, rust wash · 1958–1969 (Rosenblatt; then Minsky & Papert, “Perceptrons”)',
-    body: 'The deepest painting in the cave, and its most solemn. The disc-headed figure is the Perceptron, firstborn of the learning machines. At its birth the criers promised it would walk, speak, see and reproduce; the Navy paid. It learned truly — but only what a single straight spear can divide. On the bison’s flank the four terrible dots: same-diagonal filled, other-diagonal hollow. EITHER-OR-BUT-NOT-BOTH. No straight spear divides them; see it snap. The book that proved this froze the fires of an entire age (the elders call it the Long Winter). The figure is drawn falling, not dead — consult the next wall. The bird on the staff appears in the original Shaft at Lascaux also; its meaning is disputed there too, and we see no reason to break with tradition.',
+    date: '1958–1969', who: 'Rosenblatt; then Minsky & Papert, “Perceptrons”',
+    body: 'The deepest painting in the cave. The Perceptron, firstborn of the learning machines, could divide only what one straight spear divides. The bison bears four dots no straight spear can part. The spear snaps; the figure falls. Consult the next wall.',
     w: 1500, aspect: 1.9, size: [4.1, 2.15], seed: 161,
     draw(g) {
       const ar = g.W / g.H;
@@ -762,8 +762,8 @@ export const PAINTINGS = [
   {
     id: 'backprop',
     title: 'The Return',
-    sub: 'PANEL XVII · charcoal, red ochre · c. 1986 (Rumelhart, Hinton & Williams, in “Nature”)',
-    body: 'The next wall answers the Shaft. The disc-headed figure stands again — and where it had one disc it now has three, tier upon tier, joined by many sinews. The red marks run BACKWARD down the sinews: that is the whole spell. The figure errs at the top, and the blame for the error flows back through every joint, each sinew shifting by its share, the hidden middle tier learning what no one could teach it directly. The spear that killed its ancestor cannot kill this one; a bent blade cuts where a straight one could not. Below, the valley: the figure descends it blind, feeling for the slope, settling where the ground stops falling. The elders note the valley has many bottoms, and the figure settles in whichever it reaches first, and that this, mysteriously, is usually good enough.',
+    date: 'c. 1986', who: 'Rumelhart, Hinton & Williams, in “Nature”',
+    body: 'The figure stands again, now with three tiers of discs. The red marks run backward down the sinews: the error found at the top, the blame shared out to every joint below. A bent blade cuts where a straight one could not.',
     w: 1000, aspect: 1.2, size: [2.4, 2.0], seed: 171,
     draw(g) {
       const ar = g.W / g.H;
@@ -817,8 +817,8 @@ export const PAINTINGS = [
   {
     id: 'loom',
     title: 'The Loom of Memory',
-    sub: 'CEILING PANEL · charcoal, red ochre · c. 1949–1975 (magnetic-core memory)',
-    body: 'Painted overhead, in the weavers’ position. A lattice of rings, each threaded by three sinews, each ring magnetized one way or the other — a filled ring remembers ONE, a hollow ring remembers NOTHING, and the whole sky of them remembers everything the machine knows. For a quarter of a century nearly all computer main memory was made this way: by hand, ring by ring, wire by wire, mostly by women, with steady fingers and textile patience. The programs that steered Apollo to the Moon were woven so, and the engineers called it little-old-lady memory, and the Moon was reached on needlework. Note the diagonal sense-wire: to read a ring, the machine must try to flip it — every act of remembering erases, and what is read must at once be rewoven. The painters put it on the ceiling because that is where one looks when trying to recall something.',
+    date: 'c. 1949–1975', who: 'magnetic-core memory',
+    body: 'Painted overhead. A lattice of rings, each magnetized one way or the other, threaded by hand, mostly by women; the Moon was reached on such needlework. To read a ring is to erase it. Every memory must be rewoven.',
     w: 1150, aspect: 1.35, size: [2.7, 2.0], seed: 191, maxD: 6.5,
     draw(g) {
       const ar = g.W / g.H;
@@ -853,8 +853,8 @@ export const PAINTINGS = [
   {
     id: 'attention',
     title: 'The Intrusion',
-    sub: 'APSE PANEL · charcoal only, unweathered · c. 2017 (“Attention Is All You Need”) · CATALOGING DISPUTED',
-    body: 'This panel does not belong to the cave. The charcoal is fresh; the strokes were made with a modern hand; conservators found no calcite over the pigment, and the pigment, when dated, refused. It depicts a lattice in which every mark attends to every other mark at once — no chain, no river, no order but what the marks agree among themselves. The old painters worked one stroke after another; whoever made this worked all strokes at once, and did not stay to finish. The beast in the corner is abandoned mid-outline. The Ministry has asked that this panel not be encouraged. It is included for completeness. Something has been in the cave recently. The torch you are holding was found still warm.',
+    date: 'c. 2017', who: '“Attention Is All You Need”',
+    body: 'This panel does not belong to the cave. The charcoal is fresh, the calcite absent. Every mark attends to every other at once, in no order but their own. The beast in the corner was left mid-outline. The torch you hold was found still warm.',
     w: 1100, aspect: 1.4, size: [2.4, 1.71], seed: 181, fresh: true,
     draw(g) {
       const ar = g.W / g.H;
@@ -898,14 +898,15 @@ export const PAINTINGS = [
 
 // ------------------------------------------------------------------ the bake
 
-export function bakePainting(p, scale = 1) {
-  const W = Math.round(p.w * scale);
-  const H = Math.round((p.w / p.aspect) * scale);
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
+// k: pixel density relative to the authored size (the look does not change
+// with k, only the sharpness). Returns the canvas and its weathered pixels;
+// with put = false the pixels are not written back to the canvas.
+export function bakePainting(p, k = 1, put = true) {
+  const W = p.w, H = Math.round(p.w / p.aspect);
+  const canvas = makeCanvas(Math.round(W * k), Math.round(H * k));
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  const g = makePainter(ctx, W, H, p.seed);
+  const g = makePainter(ctx, W, H, p.seed, k);
   p.draw(g);
-  g.weather(p.fresh ? 0.25 : 1.0);
-  return canvas;
+  const img = g.weather(p.fresh ? 0.25 : 1.0, put);
+  return { canvas, img };
 }

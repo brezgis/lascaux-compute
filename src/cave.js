@@ -65,7 +65,7 @@ export const CHAMBER_ZONES = [
   { name: 'THE HALL OF AUTOMATA', short: 'HALL OF AUTOMATA', sub: 'the great beasts of computation', x: 0, z: 10, r: 9.5 },
   { name: 'THE GALLERY OF INFORMATION', short: 'GALLERY', sub: 'what may be said, and how surely', x: -21, z: -6, r: 7 },
   { name: 'THE ROTUNDA', short: 'ROTUNDA', sub: 'the laws of the herd', x: -25.5, z: -17.5, r: 5 },
-  { name: 'THE SHAFT OF THE PERCEPTRON', short: 'SHAFT', sub: 'tread quietly. something fell here.', x: -30.5, z: -27, r: 5.5 },
+  { name: 'THE SHAFT OF THE PERCEPTRON', short: 'SHAFT', sub: 'tread quietly: something fell here', x: -30.5, z: -27, r: 5.5 },
   { name: 'THE THAW', short: 'THE THAW', sub: 'below the Shaft, where the meltwater went', x: -29, z: -46, r: 6 },
   { name: 'THE NAVE OF SPEECH', short: 'NAVE OF SPEECH', sub: 'the animals that talk', x: 17, z: 0, r: 8 },
   { name: 'THE APSE', short: 'APSE', sub: 'recent intrusion — cataloging disputed', x: 19, z: -13, r: 4 },
@@ -73,7 +73,7 @@ export const CHAMBER_ZONES = [
   { name: 'THE SANCTUARY OF SAND', short: 'SAND', sub: 'where lightning was taught to sit still', x: 2, z: -31.5, r: 4.8 },
   { name: 'THE GALLERY OF THE HAND', short: 'GALLERY OF THE HAND', sub: 'the machine turns to face us', x: 17, z: -34, r: 5.6 },
   { name: 'THE LABYRINTH', short: 'LABYRINTH', sub: 'every way through is the right way', x: 32, z: -20.5, r: 9 },
-  { name: 'THE ARENA', short: 'ARENA', sub: 'where the machines learned to play, and did not stop', x: -13, z: -34.5, r: 5.8 },
+  { name: 'THE ARENA', short: 'ARENA', sub: 'where the machines learned to play', x: -13, z: -34.5, r: 5.8 },
 ];
 
 // painting placements: probe from an interior point toward the wall.
@@ -476,9 +476,9 @@ export function meshFromField(sdf, onProgress) {
     // large-scale mineral variation: warmer pockets, greyer pockets
     const m = noiseC(x * 0.05, y * 0.05, z * 0.05);
     const m2 = noiseC(x * 0.13 + 40, y * 0.13, z * 0.13);
-    let r = 0.72 + m * 0.14 + m2 * 0.05;
-    let gg = 0.64 + m * 0.09 + m2 * 0.04;
-    let b = 0.52 + m * 0.03 + m2 * 0.03;
+    const r = 0.7 + m * 0.12 + m2 * 0.05;
+    const gg = 0.65 + m * 0.08 + m2 * 0.04;
+    const b = 0.57 + m * 0.03 + m2 * 0.03;
     const aoC = Math.max(0.25, ao);
     colors[v * 3] = r * aoC; colors[v * 3 + 1] = gg * aoC; colors[v * 3 + 2] = b * aoC;
   }
@@ -493,7 +493,7 @@ export function meshFromField(sdf, onProgress) {
 
 // ------------------------------------------------------------ rock material
 
-export function makeRockTexture() {
+function makeRockTexture() {
   const S = 512;
   const c = document.createElement('canvas');
   c.width = c.height = S;
@@ -515,21 +515,56 @@ export function makeRockTexture() {
   for (let i = 0; i < 700; i++) {
     blob(rng() * S, rng() * S, 1.5 + rng() * 13, `rgba(52,42,32,${0.05 + rng() * 0.1})`);
   }
-  // fine grain
   const img = x.getImageData(0, 0, S, S);
-  for (let i = 0; i < img.data.length; i += 4) {
+  const d = img.data;
+  // fine grain
+  for (let i = 0; i < d.length; i += 4) {
     const n = (rng() - 0.5) * 18;
-    img.data[i] += n; img.data[i + 1] += n; img.data[i + 2] += n;
+    d[i] += n; d[i + 1] += n; d[i + 2] += n;
   }
-  x.putImageData(img, 0, 0);
-  const tex = new THREE.CanvasTexture(c);
+  // height for the bump, in alpha: tileable value-noise fbm (the rock's
+  // relief) plus a little of the colour's own grain, lightly box-blurred
+  // (wrapping, so it still tiles) so its slope changes smoothly between
+  // texels instead of stepping in visible blocks when magnified
+  let h = new Float32Array(S * S), tmp = new Float32Array(S * S);
+  const lattice = new Float32Array(256 * 256).map(() => rng());
+  const smooth = (t) => t * t * (3 - 2 * t);
+  const vnoise = (u, v, P) => {               // period P cells across the tile
+    const x0 = Math.floor(u), y0 = Math.floor(v), fx = smooth(u - x0), fy = smooth(v - y0);
+    const L = (i, j) => lattice[((j % P + P) % P) * 256 + ((i % P + P) % P)];
+    const a = L(x0, y0), b = L(x0 + 1, y0), c = L(x0, y0 + 1), e = L(x0 + 1, y0 + 1);
+    return a + (b - a) * fx + (c - a) * fy + (a - b - c + e) * fx * fy;
+  };
+  for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) {
+    let f = 0, amp = 0.5;
+    for (const P of [6, 12, 24, 48, 96, 192]) { f += amp * vnoise(xx / S * P, yy / S * P, P); amp *= 0.58; }
+    const i = yy * S + xx;
+    h[i] = f * 0.75 + (d[i * 4] + d[i * 4 + 1] + d[i * 4 + 2]) / 765 * 0.3;
+  }
+  const R = 1;
+  for (let pass = 0; pass < 2; pass++) {
+    for (let yy = 0; yy < S; yy++) for (let xx = 0; xx < S; xx++) {
+      let sum = 0;
+      for (let o = -R; o <= R; o++) sum += pass ? h[(((yy + o) & (S - 1)) * S) + xx] : h[yy * S + ((xx + o) & (S - 1))];
+      tmp[yy * S + xx] = sum / (2 * R + 1);
+    }
+    [h, tmp] = [tmp, h];
+  }
+  for (let i = 0; i < S * S; i++) d[i * 4 + 3] = Math.round(Math.min(1, h[i]) * 255);
+  const tex = new THREE.DataTexture(d, S, S);
+  tex.flipY = true;
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.magFilter = THREE.LinearFilter;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.generateMipmaps = true;
   tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
   return tex;
 }
 
-export function makeRockMaterial() {
+export function makeRockMaterial(aniso = 1) {
   const tex = makeRockTexture();
+  tex.anisotropy = Math.min(8, aniso);
   const mat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     vertexColors: true,
@@ -542,13 +577,15 @@ export function makeRockMaterial() {
       .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;\nvarying vec3 vWNorm;')
       .replace('#include <fog_vertex>', '#include <fog_vertex>\nvWPos = (modelMatrix * vec4(position,1.0)).xyz;\nvWNorm = normalize(mat3(modelMatrix) * normal);');
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform sampler2D rockTex;\nvarying vec3 vWPos;\nvarying vec3 vWNorm;\nfloat grotteH = 0.0;\nvec3 triplanar(sampler2D t, vec3 p, vec3 n, float s){\n  vec3 an = abs(n); an = an / (an.x + an.y + an.z);\n  vec3 cx = texture2D(t, p.zy * s).rgb;\n  vec3 cy = texture2D(t, p.xz * s).rgb;\n  vec3 cz = texture2D(t, p.xy * s).rgb;\n  return cx * an.x + cy * an.y + cz * an.z;\n}')
+      .replace('#include <common>', '#include <common>\nuniform sampler2D rockTex;\nvarying vec3 vWPos;\nvarying vec3 vWNorm;\nfloat grotteH = 0.0;\nvec4 triplanar(sampler2D t, vec3 p, vec3 n, float s){\n  vec3 an = abs(n); an = an / (an.x + an.y + an.z);\n  return texture2D(t, p.zy * s) * an.x + texture2D(t, p.xz * s) * an.y + texture2D(t, p.xy * s) * an.z;\n}')
       .replace('#include <color_fragment>',
         `#include <color_fragment>
-        vec3 rockA = triplanar(rockTex, vWPos, vWNorm, 0.24);
-        vec3 rockB = triplanar(rockTex, vWPos, vWNorm, 0.043);
-        vec3 rock = rockA * 0.7 + rockB * 0.5;
-        grotteH = dot(rockB, vec3(0.55)) + dot(rockA, vec3(0.12));
+        vec4 rockA = triplanar(rockTex, vWPos, vWNorm, 0.24);
+        vec4 rockB = triplanar(rockTex, vWPos, vWNorm, 0.043);
+        vec3 rock = rockA.rgb * 0.7 + rockB.rgb * 0.5;
+        // relief from the smoothed height in alpha: the raw colour grain,
+        // magnified, would bump into visible texel blocks
+        grotteH = rockB.a * 1.6 + rockA.a * 0.5;
         diffuseColor.rgb *= rock * 1.45;`)
       .replace('#include <normal_fragment_maps>',
         `#include <normal_fragment_maps>
@@ -561,7 +598,9 @@ export function makeRockMaterial() {
           float dhx = dFdx(grotteH);
           float dhy = dFdy(grotteH);
           vec3 vGrad = sign(det) * (dhx * r1 + dhy * r2);
-          normal = normalize(abs(det) * normal - 0.3 * vGrad);
+          // the grain fades with distance, where it would only shimmer
+          float grain = 0.4 * (1.0 - smoothstep(3.0, 12.0, length(vViewPosition)));
+          normal = normalize(abs(det) * normal - grain * vGrad);
         }`);
   };
   return mat;

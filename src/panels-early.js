@@ -13,8 +13,8 @@ export const EARLY_PANELS = [
   {
     id: 'ishango',
     title: 'The Tally Bone',
-    sub: 'PANEL XVIII · yellow ochre, engraved notches, red ochre · c. 20,000 years before the present (the Ishango bone)',
-    body: 'The only object in this cave that is genuinely old enough to have been painted here. A baboon fibula with a chip of quartz set in its end, found in 1950 by Jean de Heinzelin at Ishango, on the shore of Lake Edward in the Congo. Its notches run in three columns. One column groups them 11, 13, 17, 19 — every prime between ten and twenty (painted here in red). Another runs 11, 21, 19, 9; the third, 3, 6, 4, 8, 10, 5, 5, 7, doubles and halves. Whether its carver knew about primes, or was keeping track of the moon, or simply liked the feel of cutting, is disputed with some heat. The painters copied it faithfully and declined to take sides.',
+    date: 'c. 20,000 BP', who: 'the Ishango bone',
+    body: 'A baboon fibula, notched some twenty thousand years ago on the shore of Lake Edward. One column runs 11, 13, 17, 19: every prime between ten and twenty. Whether its carver meant this is disputed with some heat.',
     w: 1300, aspect: 2.0, size: [3.1, 1.55], seed: 201,
     draw(g) {
       // the bone: a long shaft swelling to a knuckle at the right end
@@ -56,8 +56,8 @@ export const EARLY_PANELS = [
   {
     id: 'khwarizmi',
     title: 'The Stepwise Hunter',
-    sub: 'PANEL XIX · charcoal, red ochre · c. 820 (al-Khwārizmī, House of Wisdom, Baghdad)',
-    body: 'A hunter descends a stair of numbered steps, one at a time, and at the bottom the quarry is simply there, caught: that is the whole miracle of a procedure. The first step bears a hollow red ring — the zero, which reached the West in the hunter’s own book on Hindu reckoning, whose Latin title began “Algoritmi de numero Indorum.” The scribes kept his name and lost track of who he was, and so every procedure since is an algorithm. Top right, a broken bone bound back together in red: his other book was on al-jabr, “restoration,” a word that also meant setting bones. Hence algebra, and, in old Spanish, the algebrista who set your arm.',
+    date: 'c. 820', who: 'al-Khwārizmī, House of Wisdom, Baghdad',
+    body: 'A hunter descends numbered steps, one at a time, and at the bottom the quarry is caught. The scribes kept his name, Algoritmi, and lost the man. His other book set broken things right: al-jabr, restoration.',
     w: 1150, aspect: 1.6, size: [2.7, 1.69], seed: 211,
     draw(g) {
       const ar = g.W / g.H;
@@ -111,8 +111,8 @@ export const EARLY_PANELS = [
   {
     id: 'leibniz',
     title: 'The Book of Changes, Read in Twos',
-    sub: 'PANEL XX · charcoal, red ochre, one wig · 1703 (Leibniz, “Explication de l’Arithmétique Binaire”)',
-    body: 'A figure in an enormous curled wig contemplates stacks of six bars, each bar whole or broken. They are hexagrams from the Chinese Book of Changes, which the Jesuit Joachim Bouvet had sent him from Beijing in their old Fu Xi order; Leibniz read the broken bar as 0 and the whole bar as 1 and found them counting — 0, 1, 2, 3, on up to 63 — in the binary arithmetic he had been working out for years. The letter reached him in April 1703 and he sent his paper to the Paris Académie that same month, delighted. Beneath the first stack is nothing (a hollow ring); beneath the last, a red sun. He had already proposed a medal for it: “omnibus ex nihilo ducendis sufficit unum” — to make everything out of nothing, one is enough.',
+    date: '1703', who: 'Leibniz, “Explication de l’Arithmétique Binaire”',
+    body: 'A figure in an enormous wig reads the hexagrams of the Book of Changes as broken 0 and whole 1, and finds them counting. His motto for the discovery: to make everything out of nothing, one is enough.',
     w: 1150, aspect: 1.55, size: [2.6, 1.68], seed: 221,
     draw(g) {
       const ar = g.W / g.H;
@@ -167,8 +167,8 @@ export const EARLY_PANELS = [
   {
     id: 'antikythera',
     title: 'The Sky-Wheel of the Sponge Divers',
-    sub: 'CEILING PANEL II · charcoal, yellow ochre, the green again · c. 2nd–1st century BC (the Antikythera mechanism)',
-    body: 'Painted overhead, where the sky goes. Toothed wheels mesh with toothed wheels; the great four-spoked wheel drives the rest, and from the train come the Sun, the Moon (half pale, half dark, turning to show its phase) and a spiral dial that walks the calendar of eclipses. The original is a shoebox of corroded bronze pulled in 1901 from a Roman-era wreck off the island of Antikythera by sponge divers sheltering from a storm. Some thirty of its gears survive. It modeled the Moon’s uneven pace with a pin riding in a slot, and when X-ray tomography looked inside in 2005 it found thousands of characters of instructions engraved in the bronze. Nothing like it is known for more than a thousand years afterward. The green is the second outbreak of the disputed pigment; the Ministry blames bronze disease, and the pigment blames no one.',
+    date: 'c. 2nd–1st century BC', who: 'the Antikythera mechanism',
+    body: 'Painted overhead, where the sky goes. Bronze wheels mesh to carry the Sun, the Moon in its phases, and the calendar of eclipses. Sponge divers raised it from a wreck in 1901. Nothing like it is known for a thousand years after.',
     w: 1150, aspect: 1.25, size: [2.7, 2.16], seed: 231, maxD: 6.8,
     draw(g) {
       const ar = g.W / g.H;
@@ -208,8 +208,8 @@ export const EARLY_PANELS = [
   {
     id: 'jacquard',
     title: 'The Loom That Read',
-    sub: 'PANEL XXI · charcoal, red ochre weave · 1804 (Jacquard, Lyon)',
-    body: 'A loom, and draped over it a chain of stiff cards, each punched with holes. Where a card has a hole a hooked needle passes through and its warp thread is lifted; where there is none, the thread stays down; card by card, row by row, the pattern comes out of the loom. The painters wove a beast into the cloth to show what the cards can hold — any figure at all, given enough cards. The most famous product of the method was a silk portrait of Jacquard himself, woven in 1839 from some 24,000 cards; Charles Babbage owned one, and enjoyed asking visitors whether it was an engraving; most guessed wrong. It was a memory that a machine could read, a century before there were machines to read it, and it was meant for silk.',
+    date: '1804', who: 'Jacquard, Lyon',
+    body: 'A loom reading a chain of punched cards: where there is a hole, the thread lifts. Any figure can be woven, given enough cards. It was a memory a machine could read, a century early, and it was meant for silk.',
     w: 1200, aspect: 1.45, size: [2.8, 1.93], seed: 241,
     draw(g) {
       const ar = g.W / g.H;
@@ -261,8 +261,8 @@ export const EARLY_PANELS = [
   {
     id: 'babbage',
     title: 'The Engine of Differences',
-    sub: 'PANEL XXII · charcoal, red ochre, unfinished by design · 1822–1991 (Babbage’s Difference Engine)',
-    body: 'Three columns of stacked number-wheels, geared to add each column into the next — which, by the method of differences, is enough to tabulate any polynomial without ever multiplying. A figure turns the crank; tables fall out of the bottom. The columns to the right are drawn in dotted outline only, because they were never made: Babbage proposed the engine in 1822, got a small working section built by 1832, fell out with his engineer, and moved on to the grander Analytical Engine, with its store and its mill and its instructions on Jacquard’s cards, which was never built either. In 1991 the Science Museum in London finished his Difference Engine No. 2 from the drawings. It worked. The painters record his complaint: “On two occasions I have been asked, — ‘Pray, Mr. Babbage, if you put into the machine wrong figures, will the right answers come out?’ … I am not able rightly to apprehend the kind of confusion of ideas that could provoke such a question.”',
+    date: '1822–1991', who: 'Babbage’s Difference Engine',
+    body: 'Columns of number-wheels that tabulate by addition alone. The dotted columns were never built in his lifetime; in 1991 London finished the engine from his drawings, and it worked. Asked whether wrong figures in yield right answers out, he declined to understand the question.',
     w: 1200, aspect: 1.4, size: [2.8, 2.0], seed: 251,
     draw(g) {
       const ar = g.W / g.H;
@@ -303,8 +303,8 @@ export const EARLY_PANELS = [
   {
     id: 'lovelace',
     title: 'Note G',
-    sub: 'PANEL XXIII · charcoal, red and yellow ochre · 1843 (Ada Lovelace’s notes on the Analytical Engine)',
-    body: 'A woman lifts a chain of punched cards; as the chain crosses the wall its holes turn into leaves and flowers. It illustrates her own sentence: “the Analytical Engine weaves algebraical patterns just as the Jacquard-loom weaves flowers and leaves.” Asked to translate Luigi Menabrea’s paper on Babbage’s engine, Ada, Countess of Lovelace, added seven notes, A to G, about three times the length of the original. The last, Note G, lays out step by step how the engine would compute the Bernoulli numbers — the first published program for a general-purpose computer, for a computer that did not exist. Its table contains one transposed operand, which, the Ministry notes, only proves it is a real program. She also guessed that such an engine might compose music, if music could be put into its symbols, and she was right about that too.',
+    date: '1843', who: 'Ada Lovelace’s notes on the Analytical Engine',
+    body: 'A chain of punched cards that becomes, as it crosses the wall, leaves and flowers. In Note G she set out how the Engine would compute the Bernoulli numbers: the first published program, for a machine that did not exist.',
     w: 1150, aspect: 1.35, size: [2.6, 1.93], seed: 261,
     draw(g) {
       const ar = g.W / g.H;
@@ -358,8 +358,8 @@ export const EARLY_PANELS = [
   {
     id: 'boole',
     title: 'The Laws of the Corral',
-    sub: 'PANEL XXIV · charcoal, red ochre · 1854 (Boole, “An Investigation of the Laws of Thought”)',
-    body: 'Two corrals overlap. The horned beasts live in the left; the antlered in the right; and in the lens where the fences cross stands the single animal that is horned AND antlered. Outside both, a lone beast that is NEITHER. Below, the rule that the painters thought the strangest of all: a mark taken twice together is only the mark again — Boole’s x·x = x, thought repeated adds nothing. George Boole, a shoemaker’s son from Lincoln who taught himself mathematics and ended up a professor in Cork, made logic into an algebra of 1 and 0 in 1854. The corrals themselves were added by a later hand, John Venn’s, in 1880. Eighty-three years after the book, a master’s student named Claude Shannon noticed that telephone relays obey exactly these laws, and every switch since has been Boole’s.',
+    date: '1854', who: 'Boole, “An Investigation of the Laws of Thought”',
+    body: 'Two corrals overlap. In the lens stands the beast both horned and antlered; outside, one that is neither. Below, the strangest law: x·x = x, a thought repeated adds nothing. Every switch since obeys these fences.',
     w: 1150, aspect: 1.5, size: [2.6, 1.73], seed: 271,
     draw(g) {
       const ar = g.W / g.H;
@@ -395,8 +395,8 @@ export const EARLY_PANELS = [
   {
     id: 'hollerith',
     title: 'The Census Herd',
-    sub: 'PANEL XXV · charcoal, red ochre, brown · 1890 (Hollerith’s tabulator, United States census)',
-    body: 'A people walks in from the left — tall and short, adults and children — and passes under a lintel hung with pins. On the other side they come out as cards, each punched with holes where the person was: age, sex, birthplace, and so on. Where a pin found a hole it dipped into a cup of mercury, closed a circuit, and advanced one of the dials above by one. The 1880 census had taken the better part of a decade to count by hand; with Herman Hollerith’s machines the headcount of 1890 was announced within about six weeks. His Tabulating Machine Company merged into a firm that renamed itself, in 1924, International Business Machines. The painters did not know yet what the herd would become; they only drew it growing.',
+    date: '1890', who: 'Hollerith’s tabulator, United States census',
+    body: 'A people walks under a lintel of pins and emerges as punched cards. The census of 1880 took nearly a decade by hand; the machines announced the headcount of 1890 in six weeks. The firm became International Business Machines.',
     w: 1300, aspect: 1.9, size: [3.2, 1.68], seed: 281,
     draw(g) {
       const ar = g.W / g.H;
@@ -433,8 +433,8 @@ export const EARLY_PANELS = [
   {
     id: 'colossus',
     title: 'The Sworn Beast',
-    sub: 'PANEL XXVI · charcoal, yellow ochre, later overpainted in kaolin · 1944 (Colossus, Bletchley Park)',
-    body: 'A beast built of glowing glass bottles, fed by a loop of punched tape running endlessly round its wheels. Tommy Flowers, a Post Office engineer, built it at Dollis Hill; from early 1944 it read the tape at five thousand characters a second at Bletchley Park, breaking the German high command’s teleprinter cipher (Tunny, not Enigma — Enigma was the bombes’ quarry). By war’s end there were ten. Then most were broken up, Flowers burned the drawings in a furnace, and everyone who had tended the beast kept their oath for thirty years — which is why the Room-Beast across this hall was long painted as the first of its kind. The white wash was applied deliberately, in antiquity, over the right half. The figure asks you not to mention it.',
+    date: '1944', who: 'Colossus, Bletchley Park',
+    body: 'A beast of glowing glass bottles, reading tape at five thousand characters a second against the German high command’s cipher. After the war its drawings were burned and its keepers kept silent for thirty years. The right half was whitewashed, deliberately.',
     w: 1250, aspect: 1.75, size: [3.0, 1.71], seed: 291,
     draw(g) {
       const ar = g.W / g.H;

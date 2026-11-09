@@ -69,8 +69,8 @@ export const LATE_PANELS = [
   {
     id: 'hopper',
     title: 'The Translator',
-    sub: 'PANEL XXVII · charcoal, red ochre · 1952 (Grace Hopper’s A-0, for the UNIVAC)',
-    body: 'A figure stands between two kinds of marks. On the left, the marks people make: words, curling out of a mouth. On the right, the marks the beasts eat: strokes and dots, nothing else. The figure takes in the one and puts out the other, and so the beasts were given words. “Nobody believed that I had a running compiler and nobody would touch it,” Grace Hopper recalled. “They told me computers could only do arithmetic.” Her A-0 of 1952 is usually counted the first compiler; her later FLOW-MATIC fed into COBOL, which still pays some of the world’s pensions. Below, the short red wire she handed out at lectures: about thirty centimeters, the distance light travels in a billionth of a second. Asked for a microsecond, she would produce a coil of nearly a thousand feet (bottom right) and suggest that programmers think twice before wasting one.',
+    date: '1952', who: 'Grace Hopper’s A-0, for the UNIVAC',
+    body: 'A figure takes in words and gives out the strokes the beasts eat, and so the beasts were given words. She was told computers could only do arithmetic. Below, her red wire: the distance light travels in a billionth of a second.',
     w: 1150, aspect: 1.5, size: [2.6, 1.73], seed: 301,
     draw(g) {
       const ar = g.W / g.H;
@@ -107,8 +107,8 @@ export const LATE_PANELS = [
   {
     id: 'fortranlisp',
     title: 'The Column and the Nest',
-    sub: 'PANEL XXVIII · charcoal, red ochre · 1957–1958 (FORTRAN, Backus et al., IBM; LISP, McCarthy, MIT)',
-    body: 'Two tongues, split by a crack in the rock. On the left, the Column: beasts marching in drilled ranks, each rank one line of formula, and a red arrow that sends the column back round to do it again. This is FORTRAN, the formula translator John Backus’s team at IBM delivered in 1957, the first language whose compiled output was fast enough to make the hand-coders give up. On the right, the Nest: a single beast inside brackets inside brackets inside brackets. This is LISP, John McCarthy’s 1958 language of lists, in which a program is written in the same nested shape as its data — the heresy of the Hall’s swallowed instructions, made into grammar. Both are still spoken. The Ministry has counted the closing brackets trailing off to the right and asked the painters to stop.',
+    date: '1957–1958', who: 'FORTRAN, Backus et al., IBM; LISP, McCarthy, MIT',
+    body: 'Two tongues, split by a crack. Left, the Column: beasts in drilled ranks, sent round again by a red arrow. Right, the Nest: one beast inside brackets inside brackets. Both are still spoken. The Ministry has asked that the closing brackets stop.',
     w: 1300, aspect: 1.8, size: [3.1, 1.72], seed: 311,
     draw(g) {
       const ar = g.W / g.H;
@@ -141,8 +141,8 @@ export const LATE_PANELS = [
   {
     id: 'unix',
     title: 'The Hearth of Small Tools',
-    sub: 'PANEL XXIX · charcoal, red ochre · 1969–1973 (UNIX and C, Thompson & Ritchie, Bell Labs)',
-    body: 'Five small, different animals stand in a line, joined by pipes. A stream of dots enters the first, and each animal does one small thing to it — sorts it, trims it, counts it — and passes it down the pipe to the next. The pipe, added in 1973 at Doug McIlroy’s insistence, is the soul of UNIX, which Ken Thompson and Dennis Ritchie began in 1969 on a little-used PDP-7 at Bell Labs and rewrote, in 1973, in Ritchie’s new language, C (the red crescent). Do one thing, and do it well. Its descendants count every moment from midnight, 1 January 1970, in a number that will overflow at 03:14:07 on 19 January 2038, and the painters left the end of the stream uncarved accordingly.',
+    date: '1969–1973', who: 'UNIX and C, Thompson & Ritchie, Bell Labs',
+    body: 'Small animals in a line, joined by pipes; each does one thing to the stream and passes it on. Their descendants count the seconds since 1970 in a number that overflows in 2038. The end of the stream is left uncarved.',
     w: 1350, aspect: 2.1, size: [3.3, 1.57], seed: 321,
     draw(g) {
       const ar = g.W / g.H;
@@ -184,8 +184,8 @@ export const LATE_PANELS = [
   {
     id: 'linux',
     title: 'The Flightless Bird and the Thousand Hands',
-    sub: 'PANEL XXX · charcoal, kaolin, yellow ochre, prints in every pigment · 1991 (Linux, Helsinki)',
-    body: 'A fat, upright, flightless bird — the painters of the Cosquer cave, near Marseille, drew great auks like this one twenty-odd thousand years ago — surrounded by hand stencils in every color the cave owns. Each hand added a little. On 25 August 1991 a student in Helsinki, Linus Torvalds, announced to a newsgroup that he was “doing a (free) operating system (just a hobby, won’t be big and professional like gnu).” The hands arrived. The bird (who got its portrait in 1996) now runs most of the world’s servers, every one of the five hundred fastest supercomputers, and the phone in a great many pockets. The hobby is going well.',
+    date: '1991', who: 'Linux, Helsinki',
+    body: 'A flightless bird amid hand stencils in every pigment, each hand adding a little. A student in Helsinki announced it as a hobby that would not be big or professional. It now runs most of the world’s servers.',
     w: 950, aspect: 1.05, size: [2.1, 2.0], seed: 331,
     draw(g) {
       const ar = g.W / g.H;
@@ -221,8 +221,8 @@ export const LATE_PANELS = [
   {
     id: 'transistor',
     title: 'The Gatekeeper on the Stone',
-    sub: 'PANEL XXXI · charcoal, brown and yellow ochre, red current · December 1947 (the point-contact transistor, Bell Labs)',
-    body: 'A wedge stands on a slab of stone, touching it with two gold-foil feet a hair apart, held down by a bent spring. Into one foot flows a thin red trickle; out of the other pours a red river — the small current commands the large one, and the stone has become a gate that can be opened by a whisper. In December 1947 John Bardeen and Walter Brattain made it from a plastic triangle wrapped in gold foil, slit with a razor blade, and pressed onto germanium with a bent paper clip; their group’s leader, William Shockley, who had not been in the room, went away and improved it in a fury. The three shared a Nobel Prize in 1956. The painters drew them standing well apart, which is accurate.',
+    date: 'December 1947', who: 'the point-contact transistor, Bell Labs',
+    body: 'A wedge on a slab of germanium, two gold-foil feet a hair apart. A trickle into one foot commands a river out of the other: the stone has become a gate. Its three discoverers are drawn standing well apart.',
     w: 1150, aspect: 1.4, size: [2.5, 1.79], seed: 341,
     draw(g) {
       const ar = g.W / g.H;
@@ -255,8 +255,8 @@ export const LATE_PANELS = [
   {
     id: 'ic',
     title: 'Many Beasts in One Stone',
-    sub: 'PANEL XXXII · charcoal, brown and yellow ochre · 1958–1959 (the integrated circuit: Kilby, Texas Instruments; Noyce, Fairchild)',
-    body: 'Two stones, each holding a whole herd. On the left, the stone of September 1958: a sliver of germanium about half an inch long, its few parts linked by gold wires arching through the air like loose hair. Jack Kilby, too new at Texas Instruments to have earned a summer holiday, worked it out alone in the emptied lab. On the right, the stone of 1959: flat silicon, its parts linked by metal laid down on the surface itself, nothing standing up to break — Robert Noyce’s at Fairchild, built on Jean Hoerni’s planar process. The flat one is the one that multiplied (see the doubling herd on the next wall). Kilby received the Nobel Prize in 2000. Noyce had died in 1990, and the prize is not given to the dead, so the painters gave him the larger stone.',
+    date: '1958–1959', who: 'the integrated circuit: Kilby, Texas Instruments; Noyce, Fairchild',
+    body: 'Two stones, each holding a whole herd. Kilby’s, left, is laced with wires arching like loose hair; Noyce’s lies flat, nothing standing up to break. The flat one multiplied. Noyce died before the Nobel, so the painters gave him the larger stone.',
     w: 1300, aspect: 1.8, size: [3.1, 1.72], seed: 351,
     draw(g) {
       const ar = g.W / g.H;
@@ -293,8 +293,8 @@ export const LATE_PANELS = [
   {
     id: 'moore',
     title: 'The Doubling',
-    sub: 'PANEL XXXIII · charcoal, red ochre · 1965 (Moore, “Cramming more components onto integrated circuits”)',
-    body: 'A herd that doubles at every step: one beast, then two, then four, eight, sixteen, thirty-two, each generation smaller so that the same patch of rock can hold it. The red line climbs straight, which on a wall of doublings is the most alarming shape a line can have. Gordon Moore, writing in Electronics in April 1965, guessed that the number of components on a chip would keep doubling every year; in 1975 he slowed it to every two. It was not a law of nature. It was a schedule, and an entire industry kept it for half a century, the way the cave painters kept the solstice. The last column is still being painted; the painters are finding it hard to get the brush small enough.',
+    date: '1965', who: 'Moore, “Cramming more components onto integrated circuits”',
+    body: 'A herd that doubles at every step, each generation smaller to fit the same rock. The red line climbs straight, the most alarming shape on a wall of doublings. It was a schedule, not a law, and an industry kept it for fifty years.',
     w: 1250, aspect: 1.55, size: [2.9, 1.87], seed: 361,
     draw(g) {
       const ar = g.W / g.H;
@@ -329,8 +329,8 @@ export const LATE_PANELS = [
   {
     id: 'microprocessor',
     title: 'The Whole Beast on a Fingertip',
-    sub: 'PANEL XXXIV · red ochre print, charcoal · November 1971 (the Intel 4004)',
-    body: 'Behind, faint and huge, the Room-Beast of the Hall, all dials and legs. In front, a hand pressed in red ochre, one finger raised — and on the tip of that finger, painted with the finest brush in the cave, a whole beast, with a belly full of cells like the beast of the swallowed instructions. The 4004, designed by Federico Faggin, Ted Hoff, Stan Mazor and Masatoshi Shima for a Japanese calculator company, Busicom, put an entire central processor onto one chip of some 2,300 transistors. It was roughly as capable as the Room-Beast and would fit on a fingernail. The calculator company, short of money, gave back the rights to sell the chip for anything else in exchange for a discount. The painters regarded this as the single worst trade recorded on any wall of the cave.',
+    date: 'November 1971', who: 'the Intel 4004',
+    body: 'Behind, faint, the Room-Beast. In front, a raised finger, and on its tip a whole beast: a processor on one chip. Its owners traded the rights back for a discount on calculators, the worst trade recorded in the cave.',
     w: 1100, aspect: 1.3, size: [2.5, 1.92], seed: 371,
     draw(g) {
       const ar = g.W / g.H;
@@ -364,8 +364,8 @@ export const LATE_PANELS = [
   {
     id: 'sketchpad',
     title: 'The Wand of Light',
-    sub: 'PANEL XXXV · charcoal, yellow glow, red ochre · 1963 (Sutherland’s Sketchpad, MIT Lincoln Laboratory)',
-    body: 'A figure touches a glowing disc with a wand, and on the disc its trembling line is shown again, made straight. Beside it, one small shape drawn once and repeated three times: change the first, and all its copies change with it. Ivan Sutherland wrote Sketchpad for his doctorate on the TX-2 computer at Lincoln Laboratory in 1962–63, drawing with a light pen directly on the screen; the machine held the drawing as objects that knew their own constraints — this line parallel to that, these two equal — and copies that remembered their master. Every drawing program since has been its grandchild, and a good part of how programs are organized, besides. Before this wall, the beasts only spoke; here, for the first time, one was drawn on.',
+    date: '1963', who: 'Sutherland’s Sketchpad, MIT Lincoln Laboratory',
+    body: 'A figure touches a glowing disc with a wand, and its trembling line returns made straight. A shape drawn once repeats three times; change the first and all change. Before this wall the beasts only spoke. Here one was drawn on.',
     w: 1150, aspect: 1.45, size: [2.6, 1.79], seed: 381,
     draw(g) {
       const ar = g.W / g.H;
@@ -400,8 +400,8 @@ export const LATE_PANELS = [
   {
     id: 'engelbart',
     title: 'The Mouse, and the Mother of All Demos',
-    sub: 'PANEL XXXVI · charcoal, red ochre print · 9 December 1968 (Engelbart, SRI, San Francisco)',
-    body: 'An actual mouse: body, ears, whiskers, and a long tail that runs up the wall into a glowing window, where it becomes a small red mark that moves wherever the mouse moves. The demonstrators called it the bug, a word this cave has already had occasion to use. On a stage in San Francisco in December 1968, Douglas Engelbart spent ninety minutes showing a thousand people the mouse, linked text you could click through, windows, shared editing, and a live video call to a colleague thirty miles away in Menlo Park — much of what the next fifty years would be sold as. The five-key chord pad on the left caught on less well. The mouse was named for its tail, and Engelbart said later that no one could remember who named it.',
+    date: '9 December 1968', who: 'Engelbart, SRI, San Francisco',
+    body: 'A mouse whose tail runs up the wall into a glowing window and becomes a pointer. In ninety minutes on one stage, a thousand people were shown most of the next fifty years.',
     w: 1250, aspect: 1.7, size: [2.9, 1.71], seed: 391,
     draw(g) {
       const ar = g.W / g.H;
@@ -439,8 +439,8 @@ export const LATE_PANELS = [
   {
     id: 'alto',
     title: 'The Window Wall',
-    sub: 'PANEL XXXVII · charcoal, yellow ochre, red ochre · 1973 (the Xerox Alto, Palo Alto Research Center)',
-    body: 'A tall pale slab the shape of a sheet of paper, and on it windows laid over windows, each with a dark bar across the top; in one of them, a beast drawn in square cells, dot by dot. Below, a mouse with three buttons. The Alto, built at Xerox PARC in 1973, had a screen you could draw on pixel by pixel, a mouse, overlapping windows, a network (Ethernet was invented for it) and a laser printer down the hall. It was never sold as a product. In December 1979 a young man from a small computer company was given a demonstration; the painters show him at the right-hand edge, peering in, with his eye very large. Within five years his company sold a machine that looked like this wall, and everyone else’s did not look like anything else again.',
+    date: '1973', who: 'the Xerox Alto, Palo Alto Research Center',
+    body: 'A pale slab the shape of a page, windows laid over windows, a mouse below. It was never sold. A visitor from a small company is shown at the edge, peering in, his eye very large.',
     w: 1000, aspect: 1.05, size: [2.1, 2.0], seed: 401,
     draw(g) {
       const ar = g.W / g.H;
@@ -481,8 +481,8 @@ export const LATE_PANELS = [
   {
     id: 'personal',
     title: 'The Beast Comes Home',
-    sub: 'PANEL XXXVIII · charcoal, red and yellow ochre · 1975–1977 (the Altair 8800; the Apple II; the home computer)',
-    body: 'A hut, a hearth, a family — and, sitting by the fire as if it had always lived there, a small box-shaped beast with a row of lights along its flank and a row of switches below. For thirty years the beasts had lived in machine rooms and been visited by appointment. In January 1975 a magazine, Popular Electronics, put a kit on its cover, the MITS Altair 8800, programmed by flipping its switches and answering by blinking its lights. Two young men wrote a BASIC for it and founded a company to sell it; a club of hobbyists in Menlo Park met to show off their own; from that club came, in 1977, a machine in a beige case with color graphics that people bought for their kitchens. The children in the painting are not afraid of it. That is the whole point of the painting.',
+    date: '1975–1977', who: 'the Altair 8800; the Apple II; the home computer',
+    body: 'A hut, a hearth, a family, and by the fire a small box-shaped beast with a row of lights. For thirty years the beasts had been visited by appointment. The children are not afraid of it. That is the whole point of the painting.',
     w: 1200, aspect: 1.5, size: [2.7, 1.8], seed: 411,
     draw(g) {
       const ar = g.W / g.H;
@@ -516,8 +516,8 @@ export const LATE_PANELS = [
   {
     id: 'arpanet',
     title: 'LO',
-    sub: 'PANEL XXXIX · charcoal, red ochre, a crescent moon · 29 October 1969 (the first ARPANET message, UCLA to SRI)',
-    body: 'Two camps, far apart, joined by a trail. A runner sets out from the left camp carrying marks to the right: an L, an O — and then the runner lies down, and the rest of the word is faint dots that never arrived. Late on the evening of 29 October 1969, a student programmer named Charley Kline at UCLA, in Leonard Kleinrock’s lab, tried to log in to a computer at the Stanford Research Institute, some 350 miles away. He typed L, then O, and the receiving system crashed. So the first message ever sent across the network that became the Internet was “LO,” as in lo and behold. They got the whole LOGIN through about an hour later. The painters, who knew a good omen when they saw one, painted only the first attempt.',
+    date: '29 October 1969', who: 'the first ARPANET message, UCLA to SRI',
+    body: 'Two camps joined by a trail. A runner carries L, then O, then lies down; the rest of the word never arrived. The first message across the network was therefore LO, as in lo and behold.',
     w: 1250, aspect: 1.95, size: [3.1, 1.59], seed: 421,
     draw(g) {
       const ar = g.W / g.H;
@@ -553,8 +553,8 @@ export const LATE_PANELS = [
   {
     id: 'packets',
     title: 'The Packet Herd',
-    sub: 'PANEL XL · charcoal, red ochre · 1964–1983 (packet switching, Baran and Davies; TCP/IP, Cerf and Kahn)',
-    body: 'A beast on the left is taken apart — head, back, belly, legs, tail — and each piece is sent off separately through a maze of trails, each by whatever way is open. On the right the pieces arrive in the wrong order, by different roads, and are put back together into the same beast. Paul Baran at RAND worked out in the early 1960s how to build a network that could lose any part of itself and still deliver; Donald Davies in London, independently, named the pieces packets. Vint Cerf and Bob Kahn wrote down, in 1974, the rules by which any network could hand pieces to any other, and on 1 January 1983 the ARPANET switched over to them all at once. The trail with the X across it is broken; nothing on this wall minds.',
+    date: '1964–1983', who: 'packet switching, Baran and Davies; TCP/IP, Cerf and Kahn',
+    body: 'A beast taken apart and sent down every open trail. The pieces arrive out of order, by different roads, and are assembled into the same beast. One trail is crossed out. Nothing on this wall minds.',
     w: 1300, aspect: 1.6, size: [3.0, 1.88], seed: 431,
     draw(g) {
       const ar = g.W / g.H;
@@ -585,8 +585,8 @@ export const LATE_PANELS = [
   {
     id: 'publickey',
     title: 'The Mixing of the Paints',
-    sub: 'PANEL XLI · yellow and red ochre, charcoal, mixed · 1976–1977 (Diffie & Hellman; Rivest, Shamir & Adleman)',
-    body: 'The painters’ own trade, turned into a secret. At the top, a pot of yellow that everyone may see. Each of the two painters adds to it a color of their own, told to no one — red on the left, charcoal on the right — and they swap the mixed pots in plain view, across the middle of the wall. Each then adds their own secret color again, to the pot they received, and both arrive at exactly the same brown. The crouching figure below watched every pot change hands and still cannot make that brown, because paint, once mixed, will not unmix. Whitfield Diffie and Martin Hellman published the idea in November 1976; Rivest, Shamir and Adleman made a lock of the same kind the next year. It was later revealed that three British cryptographers had painted this wall first, in secret, at GCHQ in the early 1970s, and been told to keep quiet about it.',
+    date: '1976–1977', who: 'Diffie & Hellman; Rivest, Shamir & Adleman',
+    body: 'Two painters each add a secret color to a shared yellow, trade pots in plain view, add their secret again, and arrive at the same brown. The watcher below saw every pot and cannot make it. Paint, once mixed, will not unmix.',
     w: 1150, aspect: 1.45, size: [2.6, 1.79], seed: 441,
     draw(g) {
       // the public yellow
@@ -618,8 +618,8 @@ export const LATE_PANELS = [
   {
     id: 'www',
     title: 'The Web',
-    sub: 'CEILING PANEL III · charcoal, kaolin, red ochre thread · 1989–1991 (Berners-Lee, CERN)',
-    body: 'Painted overhead, as spiders do. A web of charcoal spokes and rings, and caught at its crossings, pale little pages; one red thread leaps across the web from one page to another far away, which is the whole invention. In March 1989 Tim Berners-Lee, at the particle physics laboratory CERN, handed his boss a proposal for a way to link documents on different computers; his boss, Mike Sendall, wrote on the cover “Vague but exciting…”. The first web site was running at CERN by Christmas 1990 and opened to the world in August 1991; in April 1993 CERN put the whole thing in the public domain, so that nobody would ever own the web. The spider at the center is purely decorative. There is no center. That was also the point.',
+    date: '1989–1991', who: 'Berners-Lee, CERN',
+    body: 'Painted overhead, as spiders do. Pages caught at the crossings of a web; one red thread leaps from page to distant page, which is the whole invention. The first reader wrote “vague but exciting.” The spider is decorative. There is no center.',
     w: 1150, aspect: 1.2, size: [2.7, 2.25], seed: 451, maxD: 6.8,
     draw(g) {
       const ar = g.W / g.H;
@@ -665,8 +665,8 @@ export const LATE_PANELS = [
   {
     id: 'pagerank',
     title: 'The Trackers’ Rule',
-    sub: 'PANEL XLII · charcoal, red ochre · 1998 (Brin & Page, PageRank, Stanford)',
-    body: 'Many huts, and trails running between them. A hunter wanders from hut to hut at random, following whatever trail leaves the hut he is in — and now and then, bored, leaps to any hut at all (the dotted arc). Count, over a long enough wandering, where he spends his nights: that is how much each hut matters. The hut in red, with the most trails leading into it from huts that themselves have many, is painted largest. A hut is important if important huts point to it — the circularity is the trick, and it can be solved. Sergey Brin and Larry Page wrote it up at Stanford in 1998; their first search engine had been called BackRub. The trackers took the rule, grew very large, and became the hut that every trail led to.',
+    date: '1998', who: 'Brin & Page, PageRank, Stanford',
+    body: 'A hunter wanders hut to hut at random, now and then leaping anywhere. Where he spends his nights is each hut’s worth: a hut matters if huts that matter lead to it. The rule grew, and became the hut every trail led to.',
     w: 1200, aspect: 1.6, size: [2.8, 1.75], seed: 461,
     draw(g) {
       const huts = [[0.12, 0.3, 0.07], [0.3, 0.16, 0.06], [0.18, 0.72, 0.06], [0.52, 0.52, 0.17], [0.78, 0.2, 0.07], [0.86, 0.66, 0.08], [0.4, 0.86, 0.05], [0.66, 0.88, 0.05]];
@@ -691,8 +691,8 @@ export const LATE_PANELS = [
   {
     id: 'samuel',
     title: 'The Beast That Played Itself',
-    sub: 'PANEL XLIII · charcoal, red ochre, brown wash · 1959 (Samuel’s checkers player, IBM)',
-    body: 'A board of dark and light squares. On either side, the same beast — identical, even to the flank marks — plays against itself, while a human stands aside and watches. Arthur Samuel’s draughts program at IBM improved by playing thousands of games against copies of itself and adjusting its judgement of positions by what worked; in 1959 he described it in a paper that did much to fix a new phrase in the language: machine learning. In 1962 it beat a respectable human player. It is said that when the program was shown on television in 1956, IBM’s share price jumped fifteen points overnight. The painters, who kept no shares, recorded only that the human is looking at the beasts, and the beasts are looking at each other.',
+    date: '1959', who: 'Samuel’s checkers player, IBM',
+    body: 'The same beast plays itself across a board of dark and light squares, learning from each game what wins; its keeper called this machine learning. A human stands aside, watching. The beasts look only at each other.',
     w: 1150, aspect: 1.5, size: [2.6, 1.73], seed: 471,
     draw(g) {
       const ar = g.W / g.H;
@@ -725,8 +725,8 @@ export const LATE_PANELS = [
   {
     id: 'pong',
     title: 'The Two Paddles',
-    sub: 'PANEL XLIV · charcoal, red ochre, a heap of coins · 1962–1972 (Spacewar!, MIT; Pong, Atari)',
-    body: 'A dashed line down the middle; a paddle on either side; a single ball, its path dotted as it glances off the top wall. Any visitor can read this panel, which is why it is here. Pong was built at Atari in 1972 by Allan Alcorn, as a practice exercise his boss Nolan Bushnell gave him; the prototype was installed in Andy Capp’s Tavern in Sunnyvale, and within days it stopped working, because its coin box was jammed full of quarters. Upper left, smaller and older, two ships circle a star and shoot at each other: Spacewar!, written by Steve Russell and friends on a PDP-1 at MIT in 1962, the game that kept the students up all night a decade before anyone thought to charge for it.',
+    date: '1962–1972', who: 'Spacewar!, MIT; Pong, Atari',
+    body: 'A dashed line, two paddles, one ball. Any visitor can read this panel, which is why it is here. The first cabinet failed within days, its coin box jammed with quarters. Upper left, older, two ships circle a star.',
     w: 1150, aspect: 1.6, size: [2.7, 1.69], seed: 481,
     draw(g) {
       const ar = g.W / g.H;
@@ -763,8 +763,8 @@ export const LATE_PANELS = [
   {
     id: 'deepblue',
     title: 'The Giant and the Champion',
-    sub: 'PANEL XLV · charcoal (the painters had no blue) · May 1997 (Deep Blue vs. Kasparov, New York)',
-    body: 'A tall, square, many-eyed giant, and before it a single man, and between them a king lying on its side. IBM’s Deep Blue, looking at some two hundred million positions a second, beat the world champion Garry Kasparov by 3½ to 2½ in a six-game rematch in New York in May 1997; he had beaten an earlier version, 4–2, the year before. The last game lasted nineteen moves. Kasparov suspected human help and asked for another match. IBM declined, and took the machine apart. Palaeolithic painters had no blue pigment at all — there is essentially none in any cave — and the Ministry wishes to state that the giant is painted in charcoal under protest.',
+    date: 'May 1997', who: 'Deep Blue vs. Kasparov, New York',
+    body: 'A square, many-eyed giant; a single man; a king on its side. The giant weighed two hundred million positions a second. The man asked for another match. The giant was taken apart instead. It is painted in charcoal; the painters had no blue.',
     w: 1250, aspect: 1.7, size: [2.9, 1.71], seed: 491,
     draw(g) {
       const ar = g.W / g.H;
@@ -799,8 +799,8 @@ export const LATE_PANELS = [
   {
     id: 'alphago',
     title: 'Move 37',
-    sub: 'PANEL XLVI · charcoal and kaolin stones, one red stone · March 2016 (AlphaGo vs. Lee Sedol, Seoul)',
-    body: 'A board of crossing lines, stones of charcoal and stones of kaolin, and one stone in red, placed high on the fifth line where no stone had any business being. In the second game of five, DeepMind’s AlphaGo played this shoulder hit — move 37 — and the commentators assumed it had blundered; its own estimate was that a human would play it perhaps one time in ten thousand. It won that game, and the match, four games to one. The small red ring is Lee Sedol’s move 78 in the fourth game, a wedge nobody expected either, which won the only game a human took. Three years later he retired, saying of the machines that they “cannot be defeated.” The painters, who could not be defeated either but never had to prove it, painted both stones red.',
+    date: 'March 2016', who: 'AlphaGo vs. Lee Sedol, Seoul',
+    body: 'Charcoal and kaolin stones, and one red stone on the fifth line, where no stone had any business. Commentators called it a blunder. The small red ring is Lee Sedol’s reply two games later: the only game a human took.',
     w: 1000, aspect: 1.05, size: [2.2, 2.1], seed: 501,
     draw(g) {
       const ar = g.W / g.H;
@@ -839,8 +839,8 @@ export const LATE_PANELS = [
   {
     id: 'winter',
     title: 'The Long Winter',
-    sub: 'PANEL XLVII · kaolin, charcoal, a small fire in red · 1973–c. 2006 (the AI winters)',
-    body: 'Icicles hang from the top of the panel and snow falls across it. Frozen in a block of ice, on the left, is the disc-headed figure from the Shaft above. In the middle, three figures crouch around a very small fire and keep it going. After the Perceptron fell, and after Sir James Lighthill’s 1973 report told the British government that artificial intelligence had not delivered on its promises, the money froze; it froze again in the late 1980s, when the market for the specialized machines of the time collapsed. Through the cold a handful of people kept feeding neural networks — in Toronto, in Montreal, at Bell Labs, where one of them taught a network to read the handwritten numbers on cheques. In 2018 Geoffrey Hinton, Yoshua Bengio and Yann LeCun shared the Turing Award for not letting the fire go out.',
+    date: '1973–c. 2006', who: 'the AI winters',
+    body: 'Snow falls across the panel; the Perceptron lies frozen in ice. Three figures crouch around a very small fire and keep it going. Decades later they were honored for not letting it go out.',
     w: 1300, aspect: 1.85, size: [3.1, 1.68], seed: 511,
     draw(g) {
       const ar = g.W / g.H;
@@ -881,8 +881,8 @@ export const LATE_PANELS = [
   {
     id: 'lstm',
     title: 'The Serpent That Remembers',
-    sub: 'PANEL XLVIII · charcoal, red ochre · 1997 (Hochreiter & Schmidhuber, long short-term memory)',
-    body: 'The chain-serpent of the Gallery returns, but now a straight belt runs above it the whole length of its body, and a single red token rides the belt from the tail to the head untouched. At every link three small gates decide: whether to let a new thing onto the belt, whether to let an old thing fall off, and whether to let the head see what the belt is carrying. Older serpents forgot everything but their last few links; the sense of what they had seen long ago faded to nothing as it was passed back. Sepp Hochreiter, who had diagnosed the fading in his 1991 diploma thesis, and Jürgen Schmidhuber published this cure in 1997 (the forgetting gate was added in 1999 by Felix Gers). For the next twenty years this serpent did the listening and translating for a great many telephones.',
+    date: '1997', who: 'Hochreiter & Schmidhuber, long short-term memory',
+    body: 'The chain-serpent returns with a belt along its back; one red token rides it from tail to head untouched. At every link three gates decide what to keep, what to forget, what to show. Older serpents forgot all but their last few links.',
     w: 1350, aspect: 2.05, size: [3.3, 1.61], seed: 521,
     draw(g) {
       const ar = g.W / g.H;
@@ -921,8 +921,8 @@ export const LATE_PANELS = [
   {
     id: 'alexnet',
     title: 'The Naming of the Ten Thousand Beasts',
-    sub: 'PANEL XLIX · every pigment, charcoal funnel, two small fires · 2009–2012 (ImageNet; AlexNet)',
-    body: 'On the left, a wall of animals, row on row, each with its name-mark beneath it — a sample of the fourteen million pictures that Fei-Fei Li and her colleagues had people label, by hand, over the Internet, into more than twenty thousand kinds (ImageNet, 2009). In the middle, a funnel of stacked layers; a beast goes in at the wide end and its name comes out at the narrow one. Beneath the funnel, two small fires. In the ImageNet contest of 2012, a network of this shape built by Alex Krizhevsky, Ilya Sutskever and Geoffrey Hinton cut the error rate from about 26 percent to about 15, and it was trained on two graphics cards bought for video games, in a bedroom. The fire in the Thaw was not small after that.',
+    date: '2009–2012', who: 'ImageNet; AlexNet',
+    body: 'A wall of fourteen million named animals. A funnel: the beast goes in wide and its name comes out narrow. It was trained on two cards meant for games, in a bedroom. The fire in the Thaw was not small after that.',
     w: 1350, aspect: 1.8, size: [3.2, 1.78], seed: 531,
     draw(g) {
       const ar = g.W / g.H;
@@ -960,8 +960,8 @@ export const LATE_PANELS = [
   {
     id: 'word2vec',
     title: 'King − Man + Woman',
-    sub: 'PANEL L · charcoal, red and yellow ochre · 2013 (Mikolov et al., word2vec)',
-    body: 'Four figures at the corners of a leaning square: a man, a crowned man, a woman, a crowned woman. The red arrow that carries the man to his crown is the same arrow, same length, same slant, that carries the woman to hers. Around them, a cloud of dots: every other word, each placed by the company it keeps. Tomas Mikolov and colleagues at Google trained such maps, in 2013, from billions of words of text, a few hundred dimensions deep — the painters drew only two; the rest go on into the rock — and found that meaning had a geometry: king − man + woman lands nearest to queen. (The demonstration quietly excludes the words you started with; without that rule, the nearest point is usually still king.) “You shall know a word by the company it keeps,” the linguist J. R. Firth had written in 1957. It took the beasts fifty-six years to take him literally.',
+    date: '2013', who: 'Mikolov et al., word2vec',
+    body: 'A man, a crowned man, a woman, a crowned woman. The arrow that carries the man to his crown is the same arrow that crowns the woman. Each word is placed by the company it keeps; the other dimensions continue into the rock.',
     w: 1150, aspect: 1.4, size: [2.6, 1.86], seed: 541,
     draw(g) {
       const ar = g.W / g.H;
@@ -989,8 +989,8 @@ export const LATE_PANELS = [
   {
     id: 'gpt',
     title: 'The Intrusion, Continued',
-    sub: 'APSE PANEL II · charcoal only, unweathered · 2018–2020 (GPT, GPT-2, GPT-3) · CATALOGING DISPUTED',
-    body: 'A second fresh panel, by the same modern hand as the first. It is the Three-Headed Guesser of the Gallery, grown: not three necks but dozens, fanned out, every head looking back along the trail at a different distance, and the next mark, as before, in red. Above, the same beast drawn three times, each larger than the last. The first GPT (2018) had about a hundred and seventeen million sinews; GPT-2 (2019), a billion and a half, and was at first withheld as too dangerous to release, then released in stages; GPT-3 (2020), a hundred and seventy-five billion. Each only ever guessed the next mark. A beast of enough heads, the Gallery painters wrote, would speak. At the end of 2022 it was taught to answer back, and the queue at the cave entrance has not been short since. The Ministry cannot rule out that this plaque was written by one of them.',
+    date: '2018–2020', who: 'GPT, GPT-2, GPT-3',
+    body: 'The Three-Headed Guesser of the Gallery, grown: dozens of heads, each watching the trail, the next mark in red. A beast of enough heads, the Gallery painters wrote, would speak. The Ministry cannot rule out that this plaque was written by one.',
     w: 1150, aspect: 1.5, size: [2.4, 1.6], seed: 551, fresh: true,
     draw(g) {
       const ar = g.W / g.H;

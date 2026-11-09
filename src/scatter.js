@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { DecalGeometry } from '../vendor/DecalGeometry.js';
 import { mulberry32 } from './paint.js';
-import { MOTIFS, pickKind, bakeMotif } from './motifs.js';
+import { MOTIFS, pickKind } from './motifs.js';
 import { LAYOUT, castRay } from './cave.js';
 
 // how crowded each chamber gets
@@ -24,13 +24,21 @@ export function makeDecalProjector(caveMesh) {
   const posArr = caveMesh.geometry.attributes.position.array;
   const normArr = caveMesh.geometry.attributes.normal.array;
   const idx = caveMesh.geometry.index.array;
-  // triangle centroids, computed once
+  // triangle centroids, computed once, bucketed on a horizontal grid so a
+  // decal only looks at the triangles in the cells around it
+  const CELL = 2;
   const cen = new Float32Array(idx.length);
+  const grid = new Map();
+  const cellKey = (i, j) => i * 4096 + j;
   for (let t = 0; t < idx.length; t += 3) {
     const a = idx[t] * 3, b = idx[t + 1] * 3, c = idx[t + 2] * 3;
     cen[t] = (posArr[a] + posArr[b] + posArr[c]) / 3;
     cen[t + 1] = (posArr[a + 1] + posArr[b + 1] + posArr[c + 1]) / 3;
     cen[t + 2] = (posArr[a + 2] + posArr[b + 2] + posArr[c + 2]) / 3;
+    const k = cellKey(Math.floor(cen[t] / CELL), Math.floor(cen[t + 2] / CELL));
+    let list = grid.get(k);
+    if (!list) grid.set(k, (list = []));
+    list.push(t);
   }
   const proxy = new THREE.Mesh(new THREE.BufferGeometry());
 
@@ -38,12 +46,19 @@ export function makeDecalProjector(caveMesh) {
     const r = size.length() * 0.8 + 0.6;
     const r2 = r * r;
     const p = [], n = [];
-    for (let t = 0; t < idx.length; t += 3) {
-      const cx = cen[t] - pos.x, cy = cen[t + 1] - pos.y, cz = cen[t + 2] - pos.z;
-      if (cx * cx + cy * cy + cz * cz > r2) continue;
-      for (const v of [idx[t] * 3, idx[t + 1] * 3, idx[t + 2] * 3]) {
-        p.push(posArr[v], posArr[v + 1], posArr[v + 2]);
-        n.push(normArr[v], normArr[v + 1], normArr[v + 2]);
+    const i0 = Math.floor((pos.x - r) / CELL), i1 = Math.floor((pos.x + r) / CELL);
+    const j0 = Math.floor((pos.z - r) / CELL), j1 = Math.floor((pos.z + r) / CELL);
+    for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) {
+      const list = grid.get(cellKey(i, j));
+      if (!list) continue;
+      for (const t of list) {
+        const cx = cen[t] - pos.x, cy = cen[t + 1] - pos.y, cz = cen[t + 2] - pos.z;
+        if (cx * cx + cy * cy + cz * cz > r2) continue;
+        for (let q = 0; q < 3; q++) {
+          const v = idx[t + q] * 3;
+          p.push(posArr[v], posArr[v + 1], posArr[v + 2]);
+          n.push(normArr[v], normArr[v + 1], normArr[v + 2]);
+        }
       }
     }
     proxy.geometry.dispose();
@@ -86,9 +101,11 @@ export function makeDecalProjector(caveMesh) {
   return { project, filterFacing };
 }
 
-export function scatterPaintings({ sdf, caveMesh, scene, avoid, projector }) {
+// pigment(kind, variant, material) is handed each figure's material; it
+// supplies the painted texture (which may arrive later, from the bakers).
+export function scatterPaintings({ sdf, scene, avoid, projector, pigment }) {
   const rng = mulberry32(20260702);
-  const { project: decalGeometryFast, filterFacing } = projector || makeDecalProjector(caveMesh);
+  const { project: decalGeometryFast, filterFacing } = projector;
 
   // ---- sampling sites
   const sites = [];
@@ -120,7 +137,6 @@ export function scatterPaintings({ sdf, caveMesh, scene, avoid, projector }) {
   const placed = [];
   const helper = new THREE.Object3D();
   const variantsPer = 5;
-  const texCache = new Map();
 
   for (const site of sites) {
     let done = 0, tries = 0;
@@ -173,26 +189,20 @@ export function scatterPaintings({ sdf, caveMesh, scene, avoid, projector }) {
       // ceilings get a fully random roll; walls a light hand-tilt
       helper.rotateZ(ceilingness ? rng() * Math.PI * 2 : (rng() - 0.5) * 0.35);
 
-      const canvas = bakeMotif(kind, (rng() * variantsPer) | 0);
-      let tex = texCache.get(canvas);
-      if (!tex) {
-        tex = new THREE.CanvasTexture(canvas);
-        tex.colorSpace = THREE.SRGBColorSpace;
-        tex.anisotropy = 4;
-        texCache.set(canvas, tex);
-      }
-
+      const variant = (rng() * variantsPer) | 0;
       let geo = decalGeometryFast(hit.pos, helper.rotation, new THREE.Vector3(w, h, 1.3));
       if (!geo.attributes.position || geo.attributes.position.count === 0) { geo.dispose(); continue; }
       geo = filterFacing(geo, hit.normal);
       if (!geo) continue;
-      const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
-        map: tex, transparent: true,
+      const mat = new THREE.MeshStandardMaterial({
+        transparent: true,
         opacity: 0.6 + rng() * 0.4,                  // some figures are older
         roughness: 0.97, metalness: 0,
         polygonOffset: true, polygonOffsetFactor: -3 - (placed.length % 3),
         depthWrite: false,
-      }));
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      pigment(kind, variant, mat, mesh);
       mesh.renderOrder = 1;
       scene.add(mesh);
       placed.push({ pos: hit.pos, w, kind });

@@ -3,7 +3,7 @@
 // covered: marked beasts, hunters, hands, counting signs — and the cave's own
 // bestiary of computation: punch tape, core rings, gates, sorting nets.
 
-import { makePainter, mulberry32 } from './paint.js';
+import { makePainter, makeCanvas, mulberry32 } from './paint.js';
 import { beast, stick, spiralPts } from './paintings.js';
 
 const pickColor = (rng, opts = ['char', 'char', 'red', 'rust', 'yellow']) =>
@@ -353,23 +353,18 @@ export function pickKind(rng, ceiling) {
   return KINDS[0];
 }
 
-// variant cache: a few bakes per kind, reused across the cave
-const cache = new Map();
-
-export function bakeMotif(kind, variant) {
-  const key = kind + ':' + variant;
-  if (cache.has(key)) return cache.get(key);
+// returns the canvas and its weathered pixels; with put = false the pixels
+// are not written back to the canvas
+export function bakeMotif(kind, variant, put = true) {
   const m = MOTIFS[kind];
   const W = m.px;
   const H = Math.round(m.px / m.aspect);
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
+  const canvas = makeCanvas(W, H);
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   const seed = (kind.charCodeAt(0) * 7919 + variant * 104729 + 13) >>> 0;
   const g = makePainter(ctx, W, H, seed);
   const rng = mulberry32(seed ^ 0xabcdef);
   m.draw(g, rng);
-  g.weather(0.85 + rng() * 0.35);
-  cache.set(key, canvas);
-  return canvas;
+  const img = g.weather(0.85 + rng() * 0.35, put);
+  return { canvas, img };
 }

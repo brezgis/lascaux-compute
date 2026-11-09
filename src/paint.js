@@ -97,9 +97,23 @@ function resample(pts, step) {
   return out;
 }
 
+// ---------------------------------------------------------------- canvases
+
+// A 2-D canvas that works on the main thread and in workers alike.
+export function makeCanvas(w, h) {
+  if (typeof OffscreenCanvas !== 'undefined') return new OffscreenCanvas(w, h);
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  return c;
+}
+
 // ---------------------------------------------------------------- painter
 
-export function makePainter(ctx, W, H, seed = 1) {
+// W, H are the panel's authored ("logical") size in px; every width, radius
+// and noise frequency is in those units. k is the pixel density the canvas
+// is actually rendered at (canvas = W·k × H·k), so a panel looks the same at
+// any resolution, only sharper.
+export function makePainter(ctx, W, H, seed = 1, k = 1) {
   const rng = mulberry32(seed);
   const nz = makeNoise(mulberry32(seed ^ 0x9e3779b9));
   const spriteCache = new Map();
@@ -111,12 +125,12 @@ export function makePainter(ctx, W, H, seed = 1) {
     if (spriteCache.has(key)) return spriteCache.get(key);
     const sprites = [];
     for (let s = 0; s < 8; s++) {
-      const c = document.createElement('canvas');
-      c.width = c.height = 48;
+      const c = makeCanvas(Math.ceil(48 * k), Math.ceil(48 * k));
       // CPU-backed like the panel canvas it is stamped into: a GPU sprite
       // drawn into a CPU canvas costs a readback per daub (tens of seconds
       // over the whole cave on some GPUs)
       const x = c.getContext('2d', { willReadFrequently: true });
+      x.scale(k, k);
       const col = jitterColor(rgb, rng, 10);
       const blobs = 2 + ((rng() * 2) | 0);
       for (let b = 0; b < blobs; b++) {
@@ -151,10 +165,10 @@ export function makePainter(ctx, W, H, seed = 1) {
     const s = sprites[(rng() * sprites.length) | 0];
     const sc = (r * 2) / 30; // sprite blob ~30px effective
     ctx.globalAlpha = alpha;
-    ctx.setTransform(sc, 0, 0, sc, x, y);
+    ctx.setTransform(sc * k, 0, 0, sc * k, x * k, y * k);
     ctx.rotate(rot);
-    ctx.drawImage(s, -24, -24);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(s, -24, -24, 48, 48);
+    ctx.setTransform(k, 0, 0, k, 0, 0);
     ctx.globalAlpha = 1;
   }
 
@@ -275,7 +289,7 @@ export function makePainter(ctx, W, H, seed = 1) {
       const rr = Math.sqrt(rng()) * radp;
       const x = cxp + Math.cos(a) * rr;
       const y = cyp + Math.sin(a) * rr * 1.05;
-      if (excludePath && ctx.isPointInPath(excludePath, x, y)) continue;
+      if (excludePath && ctx.isPointInPath(excludePath, x * k, y * k)) continue;
       const fall = 1 - (rr / radp);
       const cl = nz.noise2(x * 0.02 + clump, y * 0.02);
       const al = alpha * (0.25 + 0.75 * fall) * (0.35 + 0.85 * cl);
@@ -381,7 +395,7 @@ export function makePainter(ctx, W, H, seed = 1) {
     const [x0, y0, x1, y1] = bbox || [0, 0, W, H];
     for (let y = y0; y <= y1; y += w * 0.6) {
       for (let x = x0; x <= x1; x += w * 0.6) {
-        if (!ctx.isPointInPath(path, x, y)) continue;
+        if (!ctx.isPointInPath(path, x * k, y * k)) continue;
         stamp(sprites, x + (rng() - 0.5) * w, y + (rng() - 0.5) * w, w * (0.5 + rng() * 0.4), alpha * (0.6 + rng() * 0.5), rng() * 6.28);
       }
     }
@@ -389,25 +403,32 @@ export function makePainter(ctx, W, H, seed = 1) {
   }
 
   // weathering pass: erode alpha with fbm so pigment sits *in* the rock.
-  function weather(amount = 1) {
-    const img = ctx.getImageData(0, 0, W, H);
+  // Returns the weathered pixels (straight alpha); `put` writes them back to
+  // the canvas, which a caller that only wants the pixels can skip.
+  function weather(amount = 1, put = true) {
+    const PW = ctx.canvas.width, PH = ctx.canvas.height;
+    const img = ctx.getImageData(0, 0, PW, PH);
     const d = img.data;
     const ph = rng() * 100;
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        const idx = (y * W + x) * 4 + 3;
+    const f1 = 0.012 / k, f2 = 0.11 / k;
+    for (let y = 0; y < PH; y++) {
+      for (let x = 0; x < PW; x++) {
+        const idx = (y * PW + x) * 4 + 3;
         const a = d[idx];
         if (a === 0) continue;
-        const e = nz.fbm2(x * 0.012 + ph, y * 0.012, 4);          // patchy wear
-        const h = nz.noise2(x * 0.11 + ph * 2, y * 0.11);          // granular
+        const e = nz.fbm2(x * f1 + ph, y * f1, 4);                // patchy wear
+        const h = nz.noise2(x * f2 + ph * 2, y * f2);              // granular
         let f = (0.62 + 0.48 * e) * (0.82 + 0.26 * h);
         if (e < 0.26) f *= 0.5;                                     // worn-away patches
         f = 1 - (1 - f) * amount;
         d[idx] = Math.max(0, Math.min(255, a * f * 1.35));
       }
     }
-    ctx.putImageData(img, 0, 0);
+    if (put) ctx.putImageData(img, 0, 0);
+    return img;
   }
+
+  ctx.setTransform(k, 0, 0, k, 0, 0);
 
   return {
     rng, nz, W, H, ctx,
